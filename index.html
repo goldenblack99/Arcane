@@ -3,23 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arcane Foods</title>
+  <title>Arcane Foods - Experience a World of Flavor</title>
   <style>
+    /* Body Styles */
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Open Sans', sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #ffffff;
+      background-color: #f5f5f5; /* Light gray background */
+      transition: background-color 0.3s ease-in-out;
     }
 
-    /* Header */
+    /* Header Styles */
     header {
-      background-color: #e4e4e4;
+      background-color: #e4e4e4; /* Light gray header */
       padding: 20px;
-      border-radius: 5%;
+      border-radius: 5px;
       display: flex;
-      flex-wrap: wrap; /* Wrap header content on small screens */
       justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.3s ease-in-out;
     }
 
     .logo {
@@ -28,102 +31,114 @@
     }
 
     .logo img {
-      width: 80px;
-      height: 80px; /* Adjust logo size for mobile */
+      width: 120px;
+      height: 120px;
       margin-right: 20px;
+      transition: transform 0.3s ease-in-out;
     }
 
     .logo h1 {
-      font-size: 20px; /* Reduce heading size for mobile */
+      font-size: 30px;
+      font-weight: bold;
       margin: 0;
+      color: #2d3e50; /* Dark gray text */
+      transition: color 0.3s ease-in-out;
     }
 
     nav ul {
       list-style: none;
       display: flex;
-      /* Responsive navigation: stack on small screens */
-      flex-direction: column;
-      align-items: center; /* Center navigation links on mobile */
-      margin-top: 10px; /* Add spacing for stacked navigation */
-      width: 100%; /* Take full width on mobile */
+      margin-top: 10px;
+      transition: transform 0.3s ease-in-out;
     }
 
     nav li {
-      margin: 10px 0; /* Adjust spacing between navigation links */
+      margin: 10px 15px;
     }
 
     nav a {
       text-decoration: none;
-      color: #000000;
-      padding: 10px 15px;
+      color: #2d3e50; /* Dark gray text */
+      padding: 10px 20px;
       border-radius: 5px;
       transition: background-color 0.3s ease-in-out;
     }
 
     nav a:hover {
-      background-color: #f0f0f0;
+      background-color: #cccccc; /* Light gray background on hover */
     }
 
-    /* Food Section */
+    /* Food Section Styles */
     .food {
       text-align: center;
       background-size: cover;
       background-position: center;
-      padding: 50px 20px; /* Adjust padding for smaller screens */
+      padding: 50px 20px;
       border-radius: 5px;
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
-      margin-bottom: 20px; /* Add spacing between food sections */
+      margin-bottom: 20px;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .food:hover {
+      transform: scale(1.02);
     }
 
     .food img {
       border-radius: 50%;
-      width: 150px; /* Reduce image size for mobile */
-      height: 150px;
+      width: 200px;
+      height: 200px;
+      transition: transform 0.3s ease-in-out;
     }
 
     .food button {
       border-radius: 50%;
-      padding: 10px 15px;
-      background-color: #4CAF50;
-      color: #fff;
+      padding: 10px 20px;
+      background-color: #4caf50; /* Green button */
+      color: #fff; /* White text */
       border: none;
       cursor: pointer;
       transition: background-color 0.3s ease-in-out;
     }
 
     .food button:hover {
-      background-color: #3e8e41;
+      background-color: #3e8e41; /* Darker green on hover */
     }
 
     .food h2 {
-      font-size: 28px; /* Adjust heading size for mobile */
-      color: #000000;
-      margin-bottom: 10px;
+      font-size: 32px;
+      color: #2d3e50; /* Dark gray text */
+      margin-bottom: 15px;
+      transition: color 0.3s ease-in-out;
     }
 
     .food p {
-      color: #5f5f5f;
+      color: #5f5f5f; /* Gray text */
       margin-bottom: 0px;
     }
 
-    /* Popups */
+    /* Popups Styles */
     .form-popup {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background-color: #808080;
+      background-color: #fff;
       padding: 20px;
       border: 1px solid #ccc;
-      width: 80%; /* Adjust popup width for mobile */
+      width: 90%;
+      max-width: 500px;
       text-align: center;
-      border-radius: 10%;
+      border-radius: 10px;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+      transition: opacity 0.3s ease-in-out;
     }
 
-    /* Featured Products Section */
+    /* Featured Products Styles */
     .featured-products {
       padding: 40px;
+      text-align: center;
     }
 
     .product-list {
@@ -134,22 +149,26 @@
     }
 
     .product {
-      width: 250px;
+      width: calc(50% - 10px);
+      min-width: 250px;
       text-align: center;
       border: 1px solid #ccc;
       padding: 20px;
       border-radius: 5px;
+      transition: transform 0.3s ease-in-out;
     }
 
     .product img {
       width: 100%;
       height: 200px;
       object-fit: cover;
+      transition: transform 0.3s ease-in-out;
     }
 
     .product h3 {
       font-size: 18px;
       margin-top: 10px;
+      transition: color 0.3s ease-in-out;
     }
 
     .product p {
@@ -159,16 +178,131 @@
 
     .product button {
       padding: 10px 15px;
-      background-color: #4CAF50;
-      color: #fff;
+      background-color: #4CAF50; /* Green button */
+      color: #fff; /* White text */
       border: none;
       cursor: pointer;
       transition: background-color 0.3s ease-in-out;
     }
 
     .product button:hover {
-      background-color: #3e8e41;
+      background-color: #3e8e41; /* Darker green on hover */
     }
+
+    /* Responsive Adjustments */
+    @media screen and (max-width: 768px) {
+      /* Header */
+      header {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      nav ul {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      nav li {
+        margin: 10px 0;
+      }
+
+      .logo img {
+        width: 80px;
+        height: 80px;
+      }
+
+      .logo h1 {
+        font-size: 24px;
+      }
+
+      /* Food Section */
+      .food {
+        padding: 30px 10px;
+      }
+
+      .food img {
+        width: 150px;
+        height: 150px;
+      }
+
+      .food h2 {
+        font-size: 24px;
+      }
+
+      /* Featured Products */
+      .product-list {
+        justify-content: flex-start;
+      }
+
+      .product {
+        width: 100%;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      /* Header */
+      .logo img {
+        width: 60px;
+        height: 60px;
+      }
+
+      .logo h1 {
+        font-size: 20px;
+      }
+
+      /* Food Section */
+      .food {
+        padding: 20px;
+      }
+
+      .food img {
+        width: 120px;
+        height: 120px;
+      }
+
+      .food h2 {
+        font-size: 20px;
+      }
+    }
+
+
+.table h1 {
+  font-size: 2.5em;
+  margin-bottom: 1em;
+  color: #2d3e50; /* Dark gray text */
+}
+
+.table {
+  width: 100%;
+  margin: 2em auto;
+  border-collapse: collapse;
+}
+
+.table th, td {
+  padding: 1em;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.table th {
+  background-color: #f2f2f2;
+  color: #2d3e50; /* Dark gray text */
+}
+
+.table button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 1em 2em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 1em;
+  margin: 2em auto;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
   </style>
 </head>
 <body>
@@ -179,7 +313,7 @@
     </nav>
     <nav>
       <ul>
-        <li><a href="#">About Us</a></li>
+        <li><a href="#" onclick="openForm('abt')">About Us</a></li>
         <li><a href="https://www.google.com/maps/@7.0477637,79.9660802,3a,75y,355.48h,82.88t/data=!3m6!1e1!3m4!1smhlUZR05Bdh2-9IVeos-Xg!2e0!7i16384!8i8192?entry=ttu&g_ep=EgoyMDI0MDkxNi4wIKXMDSoASAFQAw%3D%3D">Location</a></li>
         <li><a href="#" onclick="openForm('Contact')">Contact</a></li>
         <div class="form-popup" id="Contact">
@@ -200,11 +334,11 @@
       <div class="form-popup" id="rinfo">
         <form>
           <h1>RICE</h1>
-          <table>
+          <table class="table">
             <tr>
               <th></th>
-              <th>Regular</th>
-              <th>Large</th>
+              <th>(Regular)</th>
+              <th>(Large)</th>
             </tr>
             <tr>
               <td>Vegetable Fried Rice</td>
@@ -247,11 +381,11 @@
       <div class="form-popup" id="kinfo">
         <form>
           <h1>Kottu</h1>
-          <table>
+          <table class="table">
             <tr>
               <th></th>
-              <th>Regular</th>
-              <th>Large</th>
+              <th>(Regular)</th>
+              <th>(Large)</th>
             </tr>
             <tr>
               <td>Vegetable Kottu</td>
@@ -280,11 +414,11 @@
             </tr>
           </table>
           <h1>Cheese Kottu</h1>
-          <table>
+          <table class="table">
             <tr>
               <th></th>
-              <th>Regular</th>
-              <th>Large</th>
+              <th>(Regular)</th>
+              <th>(Large)</th>
             </tr>
             <tr>
               <td>Vegetable Cheese Kottu</td>
