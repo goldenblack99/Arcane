@@ -1,445 +1,352 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arcane Foods - Experience a World of Flavor</title>
-  <style>
-    /* Body Styles */
-    body {
-      font-family: 'Open Sans', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: rgba(255, 255, 255);
-      color: #000000;
-      transition: background-color 0.3s ease-in-out;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARCANE</title>
 
-    /* Header Styles */
-    header {
-      background-color: rgba(0, 0, 0, 0.6);
-      background-size: cover;
-      padding: 20px;
-      border-bottom-left-radius: 25px;
-      border-bottom-right-radius: 25px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: background-color 0.3s ease-in-out;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      animation: slidetop 2s ease forwards;
-    }
-
-    .logo img {
-      width: 120px;
-      height: 120px;
-      margin-right: 20px;
-      transition: transform 0.3s ease-in-out;
-    }
-
-    .logo h1 {
-      font-size: 30px;
-      font-weight: bold;
-      margin: 0;
-      color: #fff;
-      transition: color 0.3s ease-in-out;
-    }
-
-    nav ul {
-      list-style: none;
-      display: flex;
-      margin-top: 10px;
-      transition: transform 0.3s ease-in-out;
-      animation: slidetop 1s ease forwards;
-    }
-
-    nav li {
-      margin: 10px 15px;
-    }
-
-    nav a {
-      text-decoration: none;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 5px;
-      transition: background-color 0.3s ease-in-out;
-    }
-
-    nav a:hover {
-      background-color: rgba(255, 102, 0, 0.329);
-    }
-
-    /* Food Section Styles */
-    .food {
-      text-align: center;
-      background-size: cover;
-      background-position: center;
-      color: #000;
-      padding: 50px 20px;
-      border-radius: 50px;
-      box-shadow: 0px 2px 4px rgba(0, 0, 0, 5);
-      margin-top: 20px;
-      margin-bottom: 20px;
-      transition: transform 0.3s ease-in-out;
-    }
-
-    .food:hover {
-      transform: scale(1.01);
-      background-color: #f7f7f7;
-    }
-
-    .food img {
-      border-radius: 50%;
-      width: 200px;
-      height: 200px;
-      transition: transform 0.3s ease-in-out;
-    }
-
-    .food button {
-      border-radius: 50%;
-      padding: 10px 20px;
-      background-color: rgba(255, 102, 0);
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease-in-out;
-    }
-
-    .food button:hover {
-      background-color: rgba(255, 60, 0);
-    }
-
-    .food h2 {
-      font-size: 32px;
-      color: #000000;
-      margin-bottom: 15px;
-      transition: color 0.3s ease-in-out;
-      animation: slideleft 1s ease forwards;
-    }
-
-    .food p {
-      color: #fff; 
-      margin-bottom: 0px;
-    }
-
-    /* Popups Styles */
-    .form-popup {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #fff;
-      padding: 20px;
-      border: 1px solid #ccc;
-      width: 80%;
-      max-width: 500px;
-      text-align: center;
-      border-radius: 10px;
-      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-      transition: opacity 0.3s ease-in-out;
-    }
-
-    /* Featured Products Styles */
-    .featured-products {
-      padding: 40px;
-      text-align: center;
-    }
-
-    .product-list {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-    }
-
-    .product {
-      width: calc(50% - 10px);
-      min-width: 250px;
-      text-align: center;
-      border: 1px solid #ccc;
-      padding: 20px;
-      border-radius: 5px;
-      transition: transform 0.3s ease-in-out;
-    }
-
-    .product img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      transition: transform 0.3s ease-in-out;
-    }
-
-    .product h3 {
-      font-size: 18px;
-      margin-top: 10px;
-      transition: color 0.3s ease-in-out;
-    }
-
-    .product p {
-      font-size: 14px;
-      margin-bottom: 5px;
-    }
-
-    .product button {
-      padding: 10px 15px;
-      background-color: #4CAF50; 
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease-in-out;
-    }
-
-    .product button:hover {
-      background-color: #3e8e41;
-    }
-
-    /* Responsive Adjustments */
-    @media screen and (max-width: 768px) {
-      /* Header */
-      header {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      nav ul {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      nav li {
-        margin: 10px 0;
-      }
-
-      /* Featured Products */
-      .product-list {
-        justify-content: flex-start;
-      }
-
-      .product {
-        width: 100%;
-      }
-    }
-
-    @media screen and (max-width: 480px) {
-      /* Header */
-      .logo img {
-        width: 60px;
-        height: 60px;
-      }
-
-      .logo h1 {
-        font-size: 20px;
-      }
-
-      /* Food Section */
-      .food {
-        padding: 20px;
-      }
-
-      .food img {
-        width: 120px;
-        height: 120px;
-      }
-
-      .food h2 {
-        font-size: 20px;
-      }
-    }
-
-
-.table h1 {
-  font-size: 2.5em;
-  margin-bottom: 1em;
-  color: #2d3e50;
-}
-
-.table {
-  width: 100%;
-  margin: 2em auto;
-  border-collapse: collapse;
-}
-
-.table th, td {
-  padding: 1em;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-.table th {
-  background-color: #f2f2f2;
-  color: #2d3e50;
-}
-
-.table button {
-  background-color: #4CAF50;
-  border: none;
-  color: white;
-  padding: 1em 2em;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 1em;
-  margin: 2em auto;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-h1 {
-    font-family: 'Teko', sans-serif;
-    animation: glow 2s ease-in-out infinite alternate;
+<style>
+/* Basic styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
     text-align: center;
-  }
+}
 
-  @keyframes glow {
-    from {
-      text-shadow: 0 0 20px #ff4800;
-    }
-    to {
-      text-shadow: 0 0 30px #ff4800, 0 0 10px #ff5e00;
-    }
-  }
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    color: #fff;
+    padding: 1em;
+    text-align: center;
+}
 
-  @keyframes slidetop {
-    0% {
-        transform: translateY(-100px);
-        opacity: 0;
+.logo {
+    display: flex;
+    align-items: center;
+    margin-left: 0; /* Align logo to the left */
+}
+
+.logo img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.logo-text {
+    font-size: 1.8em;
+    margin: 0;
+}
+
+.header-text {
+    text-align: center;
+    flex-grow: 1; 
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column; /* Default to column for mobile */
+    justify-content: space-between;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    padding: 10px; 
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2em;
+}
+
+section {
+    background-color: #fff;
+    padding: 1em;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Full width for mobile */
+    box-sizing: border-box; 
+    text-align: center;
+}
+
+h1, h2 {
+    color: #6b6b6b;
+}
+
+.menu-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+}
+
+.menu-item {
+    margin: 10px; /* Reduced margin for mobile */
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    flex: 1 0 100%; /* Full width for mobile */
+    text-align: center;
+}
+
+.menu-item ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+.menu-item li {
+    margin-bottom: 10px;
+}
+
+/* Button styles */
+.button {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #555;
+}
+
+/* Google Map styles */
+.map-container {
+    width: 100%; /* Full width for mobile */
+    height: 400px;
+    margin: 20px auto;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.map-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Menu styles */
+.menu-item table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+.menu-item th, .menu-item td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+/* Tablet and larger screens */
+@media (min-width: 768px) {
+    nav ul {
+        flex-direction: row; 
+        justify-content: space-between;
     }
 
-    100% {
-        transform: translateY(0px);
-        opacity: 1;
+    nav ul li {
+        margin-bottom: 0; 
+    }
+
+    .menu-container {
+        flex-direction: row; 
+    }
+
+    .menu-item {
+        flex: 1 0 300px;
+        margin: 20px;
+    }
+
+    section {
+        width: 80%; /* Reduced width for larger screens */
+    }
+
+    .map-container {
+        width: 80%; /* Reduced width for larger screens */
     }
 }
 
-@keyframes slideleft {
-    0% {
-        transform: translateX(-100px);
-        opacity: 0;
+/* Button styles */
+.button {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #555;
+}
+
+/* Google Map styles */
+.map-container {
+    width: 80%;
+    height: 400px;
+    margin: 20px auto;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.map-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Menu styles */
+.menu-item table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+.menu-item th, .menu-item td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+/* Tablet and larger screens */
+@media (min-width: 768px) {
+    nav ul {
+        flex-direction: row; 
+        justify-content: space-between;
     }
 
-    100% {
-        transform: translateX(0px);
-        opacity: 1;
+    nav ul li {
+        margin-bottom: 0; 
+    }
+
+    .menu-container {
+        flex-direction: row; 
+    }
+
+    .menu-item {
+        flex: 1 0 300px;
+        margin: 20px;
     }
 }
 
-  </style>
+
+
+</style>
+
 </head>
 <body>
-  <header>
-    <nav class="logo">
-      <img src="logo.png" alt="Arcane Logo">
-      <h1><span class='one'>A</span><span class='two'>R</span><span class='three'>C</span><span class='four'>A</span><span class='five'>N</span><span class='six'>E</span></h1>
-    </nav>
-    <nav>
-      <ul>
-        <li><a href="#" onclick="openForm('abt')">About Us</a></li>
-        <li><a href="https://www.google.com/maps/@7.0477637,79.9660802,3a,75y,355.48h,82.88t/data=!3m6!1e1!3m4!1smhlUZR05Bdh2-9IVeos-Xg!2e0!7i16384!8i8192?entry=ttu&g_ep=EgoyMDI0MDkxNi4wIKXMDSoASAFQAw%3D%3D">Location</a></li>
-        <li><a href="#" onclick="openForm('Contact')">Contact</a></li>
-        <div class="form-popup" id="Contact">
-          <form>
-            <h2>071 352 9449</h2>
-            <button type="button" class="btn cancel" onclick="closeForm('Contact')">Close</button>
-          </form>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="logo.png" alt="ARCANE Logo">
+                <div class="logo-text">ARCANE</div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#menu">Menu</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#location">Location</a></li>
+                </ul>
+            </nav>
         </div>
-      </ul>
-    </nav>
-  </header>
-  <main>
-    <section class="food">
-      <img src="rice.jpg" alt="Rice Image">
-      <h2>Rice</h2>
-      <button class="rinfo" onclick="openForm('rinfo')">More info</button>
-
-      <div class="form-popup" id="rinfo">
-        <form>
-          <h1>RICE</h1>
-          <table class="table">
-            <tr>
-              <th></th>
-              <th>(Regular)</th>
-              <th>(Large)</th>
-            </tr>
-            <tr>
-              <td>Vegetable Fried Rice</td>
-              <td>400/=</td>
-              <td>600/=</td>
-            </tr>
-            <tr>
-              <td>Egg Fried Rice</td>
-              <td>500/=</td>
-              <td>700/=</td>
-            </tr>
-            <tr>
-              <td>Chicken Fried Rice</td>
-              <td>600/=</td>
-              <td>900/=</td>
-            </tr>
-            <tr>
-              <td>Sea Food Fried Rice</td>
-              <td>800/=</td>
-              <td>1200/=</td>
-            </tr>
-            <tr>
-              <td>Mix Fried Rice</td>
-              <td>900/=</td>
-              <td>1400/=</td>
-            </tr>
-          </table>
-
-          <button type="button" class="btn cancel" onclick="closeForm('rinfo')">Close</button>
-        </form>
-      </div>
-    </section>
-
-    <section class="food">
-      <img src="kottu.jpeg" alt="Kottu Image">
-      <h2>Kottu</h2>
-
-      <button class="kinfo" onclick="openForm('kinfo')">More Info</button>
-
-      <div class="form-popup" id="kinfo">
-        <form>
-          <h1>Kottu</h1>
-          <table class="table">
-            <tr>
-              <th></th>
-              <th>(Regular)</th>
-              <th>(Large)</th>
-            </tr>
-            <tr>
-              <td>Vegetable Kottu</td>
-              <td>500/=</td>
-              <td>700/=</td>
-            </tr>
-            <tr>
-              <td>Egg Kottu</td>
-              <td>600/=</td>
-              <td>800/=</td>
-            </tr>
-            <tr>
-              <td>Chicken Kottu</td>
-              <td>700/=</td>
-              <td>1000/=</td>
-            </tr>
-            <tr>
-              <td>Sea Food Kottu</td>
-              <td>900/=</td>
-              <td>1300/=</td>
-            </tr>
-            <tr>
-              <td>Mix Kottu</td>
-              <td>1000/=</td>
-              <td>1500/=</td>
-            </tr>
-          </table>
-          <h1>Cheese Kottu</h1>
-          <table class="table">
+    </header>
+    <main>
+        <section id="home">
+            <h1>Welcome to ARCANE</h1>
+            <p>Enjoy our delicious food and drinks!</p>
+        </section>
+        <section id="menu">
+            <h1>Menu</h1>
+            <div class="menu-container">
+                <div class="menu-item">
+                    <h2>Rice</h2>
+                    <table>
+                        <tr>
+                            <th></th>
+                            <th>(Regular)</th>
+                            <th>(Large)</th>
+                        </tr>
+                        <tr>
+                            <td>Vegetable Fried Rice</td>
+                            <td>400/=</td>
+                            <td>600/=</td>
+                        </tr>
+                        <tr>
+                            <td>Egg Fried Rice</td>
+                            <td>500/=</td>
+                            <td>700/=</td>
+                        </tr>
+                        <tr>
+                            <td>Chicken Fried Rice</td>
+                            <td>600/=</td>
+                            <td>900/=</td>
+                        </tr>
+                        <tr>
+                            <td>Sea Food Fried Rice</td>
+                            <td>800/=</td>
+                            <td>1200/=</td>
+                        </tr>
+                        <tr>
+                            <td>Mix Fried Rice</td>
+                            <td>900/=</td>
+                            <td>1400/=</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="menu-item">
+                    <h2>Kottu</h2>
+                    <table>
+                        <tr>
+                            <th></th>
+                            <th>(Regular)</th>
+                            <th>(Large)</th>
+                        </tr>
+                        <tr>
+                            <td>Vegetable Kottu</td>
+                            <td>500/=</td>
+                            <td>700/=</td>
+                        </tr>
+                        <tr>
+                            <td>Egg Kottu</td>
+                            <td>600/=</td>
+                            <td>800/=</td>
+                        </tr>
+                        <tr>
+                            <td>Chicken Kottu</td>
+                            <td>700/=</td>
+                            <td>1000/=</td>
+                        </tr>
+                        <tr>
+                            <td>Sea Food Kottu</td>
+                            <td>900/=</td>
+                            <td>1300/=</td>
+                        </tr>
+                        <tr>
+                            <td>Mix Kottu</td>
+                            <td>1000/=</td>
+                            <td>1500/=</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="menu-item">
+                    <h1>Cheese Kottu</h1>
+          <table>
             <tr>
               <th></th>
               <th>(Regular)</th>
@@ -471,42 +378,18 @@ h1 {
               <td>1800/=</td>
           </tr>
       </table>
-
-      <button type="button" class="btn cancel" onclick="closeForm('kinfo')">Close</button>
-  </form>
-</div>
-</section>
-
-
-
-
-
-
-
-
-<section class="featured-products">
-<h2>Featured Products</h2>
-<div class="product-list">
-  </div>
-</section>
+    </section>
+    <section id="contact">
+        <h1>Contact Us</h1>
+        <p>Phone: 0713529449</p>
+    </section>
+    <section id="location">
+        <h1>Our Location</h1>
+        <div class="map-container">
+            <iframe src="https://maps.google.com/maps?q=7.0477637,79.9660802&output=embed" frameborder="0" style="border:0" allowfullscreen></iframe>
+        </div>
+    </section>
 </main>
-
-
-
-
-<footer>
-<p>&copy; 2024 ARCANE</p>
-</footer>
-<script>
-
-function openForm(formId) {
-document.getElementById(formId).style.display = "block";
-}
-
-function closeForm(formId) {
-document.getElementById(formId).style.display = "none";
-}
-
-</script>
+<script src="script.js"></script>
 </body>
 </html>
