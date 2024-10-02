@@ -256,6 +256,9 @@ h1, h2 {
                 <img src="logo.png" alt="ARCANE Logo">
                 <div class="logo-text">ARCANE</div>
             </div>
+            <div class="clock">
+                <span id="clock"></span>
+            </div>
             <nav>
                 <ul>
                     <li><a href="#home">Home</a></li>
@@ -390,6 +393,21 @@ h1, h2 {
         </div>
     </section>
 </main>
-<script src="script.js"></script>
+<script>
+
+function updateClock() {
+            var currentTime = new Date();
+            var hours = currentTime.getHours();
+            var minutes = currentTime.getMinutes();
+            var seconds = currentTime.getSeconds();
+            var clockText = hours + ":" + minutes + ":" + seconds;
+            document.getElementById("clock").innerHTML = clockText;
+        }
+
+        setInterval(updateClock, 1000);
+
+
+
+</script>
 </body>
 </html>
