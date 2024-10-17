@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARCANE POS System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ARCANE POS System</h1>
+        </header>
+        
+        <main>
+            <section id="inventory">
+                <h2>Inventory Management</h2>
+                <div class="input-group">
+                    <input type="text" id="itemName" placeholder="Item Name">
+                    <input type="number" id="itemFullPrice" placeholder="Full Price">
+                    <input type="number" id="itemHalfPrice" placeholder="Half Price">
+                    <button onclick="addItem()">Add Item</button>
+                </div>
+                <ul id="itemList" class="item-list"></ul>
+            </section>
+
+            <section id="cart">
+                <h2>Cart</h2>
+                <ul id="cartList" class="cart-list"></ul>
+                <div class="cart-summary">
+                    <p id="totalAmount">Total: Rs. 0</p>
+                    <p id="totalItems">Items: 0</p>
+                    <button onclick="checkout()">Checkout</button>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="sales-summary">
+                <h2>Today Sales Summary</h2>
+                <p id="finalCount">Total Sales: 0</p>
+                <p id="finalAmount">Total Revenue: Rs. 0</p>
+                
+                <button id="clearSalesSummary">Clear Sales Summary</button>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
