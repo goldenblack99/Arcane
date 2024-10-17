@@ -3,360 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARCANE -Taste The Defference</title>
-
+    <title>ARCANE - Futuristic Dining Experience</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
     <style>
-/* Global Styles */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap');
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background-image: linear-gradient(to bottom, #333, #555);
-    background-attachment: fixed;
-    text-align: center;
-}
-
-/* Header Styles */
-
-.header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #333;
-    color: #fff;
-    padding: 1em;
-    text-align: center;
-    border-bottom: 1px solid #555;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    animation: fade-in 2s;
-}
-
-.header-container::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: linear-gradient(to bottom, #555, #333);
-    opacity: 0.5;
-    z-index: -1;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    margin-left: 0; /* Align logo to the left */
-    animation: spin 1s;
-}
-
-.logo img {
-    width: 50px;
-    height: 50px;
-    margin-right: 10px;
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
-
-.logo-text {
-    font-size: 1.8em;
-    margin: 0;
-    animation: fade-in 2s;
-}
-
-.header-text {
-    text-align: center;
-    flex-grow: 1; 
-}
-
-nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column; /* Default to column for mobile */
-    justify-content: space-between;
-    animation: fade-in 2s;
-}
-
-nav ul li {
-    margin-bottom: 10px;
-}
-
-nav a {
-    color: #fff;
-    text-decoration: none;
-    padding: 10px; 
-    transition: background-color 0.5s ease;
-    animation: fade-in 2s;
-    display: block;
-    text-align: center;
-}
-
-nav a:hover {
-    background-color: #666;
-    color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
-
-/* Main Styles */
-
-main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2em;
-    background-image: linear-gradient(to bottom, #fff, #f7f7f7);
-    background-attachment: fixed;
-    animation: fade-in 2s;
-}
-
-section {
-    background-color: #fff;
-    padding: 1em;
-    margin-bottom: 20px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    width: 100%; /* Full width for mobile */
-    box-sizing: border-box; 
-    text-align: center;
-    border-radius: 10px;
-    animation: fade-in 2s;
-}
-
-h1, h2 {
-    color: #6b6b6b;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    animation: fade-in 2s;
-}
-
-/* Menu Styles */
-
-.menu-container {
-    display: flex;
-    margin-left: -20px;
-    flex-wrap: wrap;
-    justify-content: center;
-    text-align: center;
-    background-color: linear-gradient(to bottom, #fff, #bbbbbb);
-    background-attachment: fixed;
-    animation: fade-in 2s;
-}
-
-.menu-item {
-    margin: 10px; /* Reduced margin for mobile */
-    padding: 10px;
-    background-color: #fff;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    flex: 1 0 100%; /* Full width for mobile */
-    text-align: center;
-    border-radius: 10px;
-    animation: fade-in 2s;
-}
-
-.menu-item ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    animation: fade-in 2s;
-}
-
-.menu-item li {
-    margin-bottom: 0px;
-    animation: fade-in 2s;
-}
-
-
-        /* Button Styles */
-
-        .button {
-            background-color: #333;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.5s ease;
-            animation: fade-in 2s;
+        :root {
+            --primary-color: #00ffff;
+            --secondary-color: #ff00ff;
+            --bg-color: #0a0a0a;
+            --text-color: #ffffff;
+            --extra-color: #FF6600;
         }
 
-        .button:hover {
-            background-color: #666;
-            color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* Google Map Styles */
-
-        .map-container {
-            width: 100%; /* Full width for mobile */
-            height: 400px;
-            margin: 20px auto;
-            border: 1px solid #ddd;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            animation: fade-in 2s;
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
         }
 
-        .map-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            animation: fade-in 2s;
-        }
-
-        /* Menu Table Styles */
-
-        .menu-item table {
-            width: 100%;
-            border-collapse: collapse;
+        .container {
+            width: 90%;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
-        .menu-item th, .menu-item td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-        }
-
-        /* Tablet and larger screens */
-
-        @media (min-width: 768px) {
-            nav ul {
-                flex-direction: row; 
-                justify-content: space-between;
-            }
-
-            nav ul li {
-                margin-bottom: 0; 
-                margin-right: 20px;
-            }
-
-            nav a {
-                display: inline-block;
-            }
-
-            .menu-container {
-                flex-direction: row; 
-            }
-
-            .menu-item {
-                flex: 1 0 300px;
-                margin: 20px;
-            }
-
-            section {
-                width: 80%; /* Reduced width for larger screens */
-            }
-
-            .map-container {
-                width: 80%; /* Reduced width for larger screens */
-            }
-
-            .mobile-nav {
-                display: none; /* Hide on desktop */
-            }
-        }
-
-        /* Futuristic Styles */
-
-        body {
-            background-image: linear-gradient(to bottom, #333, #555);
-            background-attachment: fixed;
-        }
-
-        .header-container {
-            background-image: linear-gradient(to bottom, #555, #333);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-
-        .header-container::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
+        header {
+            background-color: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
             width: 100%;
-            height: 100%;
-            background-image: linear-gradient(to bottom, #555, #333);
-            opacity: 0.5;
-            z-index: -1;
+            z-index: 1000;
+            padding: 1rem 0;
         }
 
-        .logo img {
-            border-radius: 50%;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        nav a {
-            transition: background-color 0.5s ease;
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--extra-color);
+            text-shadow: 0 0 10px var(--extra-color);
         }
 
-        nav a:hover {
-            background-color: #666;
-            color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        nav ul {
+            display: flex;
+            list-style: none;
         }
 
-        main {
-            background-image: linear-gradient(to bottom, #fff, #f7f7f7);
-            background-attachment: fixed;
+        nav ul li {
+            margin-left: 2rem;
         }
 
-        section {
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        nav ul li a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 300;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/api/placeholder/1920/1080') no-repeat center center/cover;
         }
 
         h1, h2 {
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 1rem;
         }
 
-        .menu-container {
-            background-image: linear-gradient(to bottom, #fff, #f7f7f7);
-            background-attachment: fixed;
+        h1 {
+            font-size: 3.5rem;
+            text-transform: uppercase;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            text-decoration: none;
+            font-weight: 700;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+        }
+
+        .cta-button:hover {
+            background-color: var(--secondary-color);
+            box-shadow: 0 0 20px var(--secondary-color);
+        }
+
+        .section {
+            padding: 5rem 0;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .menu-category {
+            background-color: rgba(255,255,255,0.05);
+            padding: 2rem;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-category:hover {
+            transform: translateY(-5px);
         }
 
         .menu-item {
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
         }
 
-        .menu-item table {
-            border-collapse: collapse;
-            border-spacing: 0;
-            width: 100%;
-            border: 1px solid #ddd;
+        .menu-item-name {
+            color: var(--primary-color);
         }
 
-        .menu-item th, .menu-item td {
-            border: 1px solid #ddd;
-            padding: 10px;
+        .menu-item-price {
+            color: var(--secondary-color);
+        }
+
+        #contact, #location {
             text-align: center;
         }
 
-        .button {
-            background-color: #333;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.5s ease;
-            animation: fade-in 2s;
-        }
 
-        .button:hover {
-            background-color: #666;
-            color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Google Map Styles */
-
-        .map-container {
+        .map {
             width: 100%; /* Full width for mobile */
             height: 400px;
             margin: 20px auto;
@@ -366,281 +165,184 @@ h1, h2 {
             animation: fade-in 2s;
         }
 
-        .map-container iframe {
+        .map iframe {
             width: 100%;
             height: 100%;
             border: none;
             animation: fade-in 2s;
         }
 
-        /* Animations */
-
-        @keyframes fade-in {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            background-color: rgba(255,255,255,0.05);
         }
-
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @keyframes pulse {
-            from {
-                transform: scale(1);
-            }
-            to {
-                transform: scale(1.1);
-            }
-        }
-
-        @keyframes bounce {
-            from {
-                transform: translateY(0);
-            }
-            to {
-                transform: translateY(10px);
-            }
-        }
-
-        /* Responsive Design */
 
         @media (max-width: 768px) {
-            .header-container {
+            .header-content {
                 flex-direction: column;
             }
 
             nav ul {
-                flex-direction: column;
+                margin-top: 1rem;
             }
 
-            .menu-container {
-                flex-direction: column;
-            }
-
-            .menu-item {
-                margin: 10px;
-            }
-
-            section {
-                width: 100%;
-            }
-
-            .map-container {
-                width: 100%;
+            nav ul li {
+                margin-left: 1rem;
+                margin-right: 1rem;
             }
         }
-
-        .mobile-nav {
-            display: block; /* Hide by default on desktop */
-            background-color: #050505;
-            border-radius: 15px; /* Rounded corners */
-            padding: 10px 10px; /* Add some padding */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-            position: fixed; 
-            bottom: 20px; /* Position from the bottom */
-            left: 50%; 
-            transform: translateX(-50%); /* Center horizontally */
-            width: 90%; /* Occupy most of the screen width */
-            max-width: 500px; /* Limit the maximum width */
-            z-index: 1000; /* Ensure it stays on top */
-        }
-
-        .mobile-nav ul {
-            display: flex;
-            justify-content: space-around;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .mobile-nav li {
-            flex: 1; /* Equal width for each list item */
-            text-align: center; 
-        }
-
-        .mobile-nav a {
-            display: block;
-            padding: 12px;
-            text-decoration: none;
-            color: #ffffff; /* Adjust color as needed */
-            font-size: 1.2em; 
-            border-radius: 50px;
-        }
-
-        .mobile-nav .active {
-            color: #ff3300; /* Highlight the active link */
-        }
-
-
     </style>
-
-
 </head>
 <body>
-  <header>
-      <div class="header-container">
-          <div class="logo">
-              <img src="logo.png" alt="ARCANE Logo">
-              <div class="logo-text">ARCANE</div>
-          </div>
-          <p>Taste The Defference</p>
-          <div class="clock">
-              <span id="clock"></span>
-          </div>
-          <nav class="mobile-nav">
-              <ul>
-                  <li><a href="#home">Home</a></li>
-                  <li><a href="#menu">Menu</a></li>
-                  <li><a href="#contact">Contact</a></li>
-                  <li><a href="#location">Location</a></li>
-              </ul>
-          </nav>
-      </div>
-  </header>
-  <main>
-      <section id="home">
-          <h1>Welcome to ARCANE</h1>
-          <p>Enjoy our delicious food and drinks in a futuristic setting!</p>
-      </section>
-      <section id="menu">
-          <h1>Menu</h1>
-          <div class="menu-container">
-              <div class="menu-item">
-                  <h2>Rice</h2>
-                  <table>
-                      <tr>
-                          <th></th>
-                          <th>(Regular)</th>
-                          <th>(Large)</th>
-                      </tr>
-                      <tr>
-                          <td>Vegetable Fried Rice</td>
-                          <td>400/=</td>
-                          <td>600/=</td>
-                      </tr>
-                      <tr>
-                          <td>Egg Fried Rice</td>
-                          <td>500/=</td>
-                          <td>700/=</td>
-                      </tr>
-                      <tr>
-                          <td>Chicken Fried Rice</td>
-                          <td>600/=</td>
-                          <td>900/=</td>
-                      </tr>
-                      <tr>
-                          <td>Sea Food Fried Rice</td>
-                          <td>800/=</td>
-                          <td>1200/=</td>
-                      </tr>
-                      <tr>
-                          <td>Mix Fried Rice</td>
-                          <td>900/=</td>
-                          <td>1400/=</td>
-                      </tr>
-                  </table>
-              </div>
-              <div class="menu-item">
-                  <h2>Kottu</h2>
-                  <table>
-                      <tr>
-                          <th></th>
-                          <th>(Regular)</th>
-                          <th>(Large)</th>
-                      </tr>
-                      <tr>
-                          <td>Vegetable Kottu</td>
-                          <td>500/=</td>
-                          <td>700/=</td>
-                      </tr>
-                      <tr>
-                          <td>Egg Kottu</td>
-                          <td>600/=</td>
-                          <td>800/=</td>
-                      </tr>
-                      <tr>
-                          <td>Chicken Kottu</td>
-                          <td>700/=</td>
-                          <td>1000/=</td>
-                      </tr>
-                      <tr>
-                          <td>Sea Food Kottu</td>
-                          <td>900/=</td>
-                          <td>1300/=</td>
-                      </tr>
-                      <tr>
-                          <td>Mix Kottu</td>
-                          <td>1000/=</td>
-                          <td>1500/=</td>
-                      </tr>
-                  </table>
-              </div>
-                <div class="menu-item">
-                    <h1>Cheese Kottu</h1>
-          <table>
-            <tr>
-              <th></th>
-              <th>(Regular)</th>
-              <th>(Large)</th>
-            </tr>
-            <tr>
-              <td>Vegetable Cheese Kottu</td>
-              <td>600/=</td>
-              <td>800/=</td>
-            </tr>
-            <tr>
-              <td>Egg Cheese Kottu</td>
-              <td>800/=</td>
-              <td>1100/=</td>
-            </tr>
-            <tr>
-              <td>Chicken Cheese Kottu</td>
-              <td>900/=</td>
-              <td>1300/=</td>
-          </tr>
-          <tr>
-              <td>Sea Food Cheese Kottu</td>
-              <td>1200/=</td>
-              <td>1600/=</td>
-          </tr>
-          <tr>
-              <td>Mix Cheese Kottu</td>
-              <td>1400/=</td>
-              <td>1800/=</td>
-          </tr>
-      </table>
-    </section>
-    <section id="contact">
-      <h1>Contact Us</h1>
-      <p>Phone: 0713529449</p>
-  </section>
-  <section id="location">
-      <h1>Our Location</h1>
-      <div class="map-container">
-          <iframe src="https://maps.google.com/maps?q=7.0477637,79.9660802&output=embed" frameborder="0" style="border:0" allowfullscreen></iframe>
-      </div>
-  </section>
-</main>
-<script>
-  function updateClock() {
-      var currentTime = new Date();
-      var hours = currentTime.getHours();
-      var minutes = currentTime.getMinutes();
-      var seconds = currentTime.getSeconds();
-      var clockText = hours + ":" + minutes + ":" + seconds;
-      document.getElementById("clock").innerHTML = clockText;
-  }
+    <header>
+        <div class="container header-content">
+            <div class="logo">ARCANE</div>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#menu">Menu</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#location">Location</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-  setInterval(updateClock, 1000);
-</script>
+    <main>
+        <section id="home" class="hero">
+            <h1>Welcome to ARCANE</h1>
+            <p>Experience outdoor dining!</p>
+            <a href="#menu" class="cta-button">Explore Our Menu</a>
+        </section>
+
+        <section id="menu" class="section">
+            <div class="container">
+                <h2>Our Menu</h2>
+                <div class="menu-grid">
+                    <div class="menu-category">
+                        <h3>Fried Rice </h3>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Vegetable Fried Rice</span>
+                            <span class="menu-item-price">400/= (R) | 600/= (L)</span>
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Egg Fried Rice</span>
+                            <span class="menu-item-price">500/= (R) | 700/= (L)</span>
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Chicken Fried Rice</span>
+                            <span class="menu-item-price">600/= (R) | 900/= (L)</span>
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Seafood Fried Rice</span>
+                            <span class="menu-item-price">800/= (R) | 1200/= (L)</span>
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Mix Fried Rice</span>
+                            <span class="menu-item-price">900/= (R) | 1400/= (L)</span>
+                        </div>
+                    </div>
+                    <div class="menu-category">
+                        <h3>Kottu</h3>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Vegetable Kottu</span>
+                            <span class="menu-item-price">500/= (R) | 700/= (L)</span>
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Egg Kottu</span>
+                            <span class="menu-item-price">600/= (R) | 800/= (L)</span>
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Chicken Kottu</span>
+                            <span class="menu-item-price">700/= (R) | 1000/= (L)</span>
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Seafood Kottu</span>
+                            <span class="menu-item-price">900/= (R) | 1300/= (L)</span>
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Mix Kottu</span>
+                            <span class="menu-item-price">1000/= (R) | 1500/= (L)</span>
+                        </div>
+                    </div>
+                    <div class="menu-category">
+                        <h3>Cheese Kottu</h3>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Vegetable Cheese Kottu</span>
+                            <span class="menu-item-price">600/= (R) | 800/= (L)</span>
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Egg Cheese Kottu</span>
+                            <span class="menu-item-price">800/= (R) | 1100/= (L)</span>
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Chicken Cheese Kottu</span>
+                            <span class="menu-item-price">900/= (R) | 1300/= (L)</span>
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Seafood Cheese Kottu</span>
+                            <span class="menu-item-price">1200/= (R) | 1600/= (L)</span>
+                        </div>
+                        <div class="menu-item">
+                            <span class="menu-item-name">Mix Cheese Kottu</span>
+                            <span class="menu-item-price">1400/= (R) | 1800/= (L)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="section">
+            <div class="container">
+                <h2>Contact Us</h2>
+                <p>We look forward to serving you..</p>
+                <p>Phone: (+94)71 352 9449</p>
+                <p>Email: arcanecafe24@gmail.com</p>
+            </div>
+        </section>
+
+        <section id="location" class="section">
+            <div class="container">
+                <h2>Our Location</h2>
+                <p>Visit us -</p>
+                <div id="map">
+                    <iframe src="https://maps.google.com/maps?q=7.0477637,79.9660802&output=embed" frameborder="0" style="border:0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2024 ARCANE Restaurant. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // GSAP animations
+        gsap.from(".logo", {duration: 1, opacity: 0, y: -50, ease: "power3.out"});
+        gsap.from("nav ul li", {duration: 1, opacity: 0, y: -50, stagger: 0.2, ease: "power3.out"});
+        gsap.from(".hero h1", {duration: 1, opacity: 0, y: 50, delay: 0.5, ease: "power3.out"});
+        gsap.from(".hero p", {duration: 1, opacity: 0, y: 50, delay: 0.7, ease: "power3.out"});
+        gsap.from(".cta-button", {duration: 1, opacity: 0, y: 50, delay: 0.9, ease: "power3.out"});
+
+        // Parallax effect on scroll
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelector('.hero');
+            parallax.style.backgroundPositionY = -(scrolled * 0.5) + 'px';
+        });
+    </script>
 </body>
 </html>
