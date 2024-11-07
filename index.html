@@ -343,6 +343,25 @@
             const parallax = document.querySelector('.hero');
             parallax.style.backgroundPositionY = -(scrolled * 0.5) + 'px';
         });
+
+
+                const titleText = "ARCANE";
+        let i = 0;
+
+        function typeTitle() {
+            if (i <= titleText.length) {
+                document.title = titleText.substring(0, i);
+                i++;
+            } else {
+                i = 0; // Reset index to start the typing animation again
+                setTimeout(typeTitle, 1000); // Pause before restarting
+                return;
+            }
+            setTimeout(typeTitle, 200); // Typing speed
+        }
+
+        window.onload = typeTitle;
+
     </script>
 </body>
 </html>
