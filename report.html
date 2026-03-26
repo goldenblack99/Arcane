@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONE Report Generator</title>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <style>
+    body {
+      font-family: 'Georgia', serif;
+      background: #f8f5f0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      background: white;
+      width: 100%;
+      max-width: 650px;
+      padding: 40px 50px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border: 1px solid #d2c8b8;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #2c2c2c;
+      margin: 0;
+    }
+    .date-range {
+      text-align: center;
+      font-size: 1.15em;
+      margin: 10px 0 30px 0;
+      color: #555;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #d2c8b8;
+      margin: 30px 0;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 15px 0;
+    }
+    li {
+      margin: 12px 0;
+      font-size: 1.1em;
+    }
+    .total {
+      text-align: right;
+      font-weight: bold;
+      font-size: 1.25em;
+      margin-top: 15px;
+    }
+    .input-area {
+      background: #f9f6f0;
+      padding: 25px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    label {
+      display: block;
+      margin: 12px 0 5px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 1.05em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background: #2c2c2c;
+      color: white;
+      padding: 12px 25px;
+      font-size: 1.05em;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #444;
+    }
+    .report {
+      margin-top: 30px;
+      border: 2px solid #d2c8b8;
+      padding: 35px;
+      background: white;
+    }
+    .download-btn {
+      background: #0066cc;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h2>ONE Report Generator</h2>
+
+  <div class="input-area">
+    <label>Date Range (e.g. 20/03/2026 to 23/03/2026)</label>
+    <input type="text" id="dateRange" value="20/03/2026 to 23/03/2026">
+
+    <h3 style="margin-top:25px;">ONE INWARD REPORT</h3>
+    <label>20FR</label><input type="number" id="in20fr" value="0">
+    <label>20GP</label><input type="number" id="in20gp" value="10">
+    <label>20RF</label><input type="number" id="in20rf" value="0">
+    <label>40GP</label><input type="number" id="in40gp" value="2">
+    <label>40HC</label><input type="number" id="in40hc" value="42">
+    <label>40HCRF</label><input type="number" id="in40hcrf" value="9">
+    <label>45HC</label><input type="number" id="in45hc" value="0">
+
+    <h3 style="margin-top:25px;">ONE OUTWARD REPORT</h3>
+    <label>20FR</label><input type="number" id="out20fr" value="0">
+    <label>20GP</label><input type="number" id="out20gp" value="8">
+    <label>20RF</label><input type="number" id="out20rf" value="0">
+    <label>40GP</label><input type="number" id="out40gp" value="0">
+    <label>40HC</label><input type="number" id="out40hc" value="19">
+    <label>40HCRF</label><input type="number" id="out40hcrf" value="1">
+    <label>45HC</label><input type="number" id="out45hc" value="1">
+
+    <button onclick="generateReport()">Generate Report</button>
+    <button onclick="downloadAsImage()" class="download-btn">Download Report as Image</button>
+  </div>
+
+  <div id="output" class="report"></div>
+
+</div>
+
+<script>
+function pad(num) {
+  return String(num || 0).padStart(2, '0');
+}
+
+function generateReport() {
+  const dateRange = document.getElementById('dateRange').value || '20/03/2026 to 23/03/2026';
+
+  // Inward
+  const in20fr   = parseInt(document.getElementById('in20fr').value) || 0;
+  const in20gp   = parseInt(document.getElementById('in20gp').value) || 0;
+  const in20rf   = parseInt(document.getElementById('in20rf').value) || 0;
+  const in40gp   = parseInt(document.getElementById('in40gp').value) || 0;
+  const in40hc   = parseInt(document.getElementById('in40hc').value) || 0;
+  const in40hcrf = parseInt(document.getElementById('in40hcrf').value) || 0;
+  const in45hc   = parseInt(document.getElementById('in45hc').value) || 0;
+
+  const inwardItems = [
+    {code: "20FR",   qty: in20fr},
+    {code: "20GP",   qty: in20gp},
+    {code: "20RF",   qty: in20rf},
+    {code: "40GP",   qty: in40gp},
+    {code: "40HC",   qty: in40hc},
+    {code: "40HCRF", qty: in40hcrf},
+    {code: "45HC",   qty: in45hc}
+  ];
+
+  const inwardTotal = inwardItems.reduce((sum, item) => sum + item.qty, 0);
+
+  // Outward
+  const out20fr   = parseInt(document.getElementById('out20fr').value) || 0;
+  const out20gp   = parseInt(document.getElementById('out20gp').value) || 0;
+  const out20rf   = parseInt(document.getElementById('out20rf').value) || 0;
+  const out40gp   = parseInt(document.getElementById('out40gp').value) || 0;
+  const out40hc   = parseInt(document.getElementById('out40hc').value) || 0;
+  const out40hcrf = parseInt(document.getElementById('out40hcrf').value) || 0;
+  const out45hc   = parseInt(document.getElementById('out45hc').value) || 0;
+
+  const outwardItems = [
+    {code: "20FR",   qty: out20fr},
+    {code: "20GP",   qty: out20gp},
+    {code: "20RF",   qty: out20rf},
+    {code: "40GP",   qty: out40gp},
+    {code: "40HC",   qty: out40hc},
+    {code: "40HCRF", qty: out40hcrf},
+    {code: "45HC",   qty: out45hc}
+  ];
+
+  const outwardTotal = outwardItems.reduce((sum, item) => sum + item.qty, 0);
+
+  // Build Inward HTML (only items with qty > 0)
+  let inwardList = '';
+  inwardItems.forEach(item => {
+    if (item.qty > 0) {
+      inwardList += `<li>• ${item.code} - ${pad(item.qty)}</li>`;
+    }
+  });
+
+  // Build Outward HTML (only items with qty > 0)
+  let outwardList = '';
+  outwardItems.forEach(item => {
+    if (item.qty > 0) {
+      outwardList += `<li>• ${item.code} - ${pad(item.qty)}</li>`;
+    }
+  });
+
+  let html = `
+    <div style="text-align:center; margin-bottom:20px;">
+      <h1>ONE INWARD REPORT</h1>
+      <p class="date-range">${dateRange}</p>
+    </div>
+
+    <ul>${inwardList}</ul>
+    <div class="total">TOTAL = ${inwardTotal}</div>
+
+    <hr>
+
+    <div style="text-align:center; margin:40px 0 20px;">
+      <h1>ONE OUTWARD REPORT</h1>
+      <p class="date-range">${dateRange}</p>
+    </div>
+
+    <ul>${outwardList}</ul>
+    <div class="total">TOTAL = ${outwardTotal}</div>
+  `;
+
+  document.getElementById('output').innerHTML = html;
+}
+
+function downloadAsImage() {
+  const reportElement = document.getElementById('output');
+  if (!reportElement.innerHTML.trim()) {
+    alert("Please generate the report first!");
+    return;
+  }
+
+  html2canvas(reportElement, {
+    scale: 2,
+    backgroundColor: "#ffffff"
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'ONE_Report.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+}
+
+// Initial load
+window.onload = generateReport;
+</script>
+
+</body>
+</html>
