@@ -72,12 +72,31 @@
       font-weight: bold;
       color: #334155;
     }
-    input {
+    input[type="text"], input[type="number"] {
       width: 100%;
       padding: 11px;
       font-size: 1.05em;
       border: 1px solid #94a3b8;
       border-radius: 6px;
+    }
+    .upload-area {
+      border: 2px dashed #94a3b8;
+      border-radius: 10px;
+      padding: 40px 20px;
+      text-align: center;
+      background: #f8fafc;
+      margin: 15px 0;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .upload-area:hover {
+      border-color: #1e40af;
+      background: #f0f4ff;
+    }
+    .upload-area p {
+      margin: 10px 0 5px;
+      color: #475569;
+      font-size: 1.1em;
     }
     button {
       background: #1e40af;
@@ -107,7 +126,7 @@
       max-width: 100%;
       height: auto;
       display: block;
-      margin: 35px auto;   /* Centered */
+      margin: 35px auto;
       border: 1px solid #cbd5e1;
       box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
@@ -128,10 +147,10 @@
 
   <div class="input-area">
     <label>Main Report Date</label>
-    <input type="text" id="mainDate" value="01-Apr-2026">
+    <input type="text" id="mainDate" value="01-April-2026">
 
     <label>ONE Movement Reports Date</label>
-    <input type="text" id="oneDate" value="01-Apr-2026">
+    <input type="text" id="oneDate" value="01-April-2026">
 
     <h3>ONE Inward At</h3>
     <label>20FR</label><input type="number" id="in20fr" value="0">
@@ -153,16 +172,22 @@
     <label>40HCRF</label><input type="number" id="out40hcrf" value="0">
     <label>45HC</label><input type="number" id="out45hc" value="0">
 
+    <!-- Improved Image Upload Area -->
+    <label style="margin-top: 25px;">Daily Inventory Table Image</label>
+    <div class="upload-area" id="uploadArea">
+      <p><strong>Click here to choose file</strong></p>
+      <p>OR</p>
+      <p><strong>Press Ctrl + V</strong> to paste image from clipboard</p>
+      <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+    </div>
+
     <button onclick="generateReport()">Generate Report</button>
   </div>
-
-  <h3>Upload Daily Inventory Table Image</h3>
-  <input type="file" id="imageUpload" accept="image/*">
 
   <div id="output" class="report-section"></div>
 
   <button onclick="downloadAsImage()" class="download-btn">
-    Download Here :)
+    Download Report as Image :)
   </button>
 
 </div>
@@ -174,7 +199,15 @@ function pad(num) {
 
 let uploadedImageURL = null;
 
-document.getElementById('imageUpload').addEventListener('change', function(e) {
+const uploadArea = document.getElementById('uploadArea');
+const fileInput = document.getElementById('imageUpload');
+
+// Click to choose file
+uploadArea.addEventListener('click', () => {
+  fileInput.click();
+});
+
+fileInput.addEventListener('change', function(e) {
   const file = e.target.files[0];
   if (file) {
     const reader = new FileReader();
@@ -186,11 +219,33 @@ document.getElementById('imageUpload').addEventListener('change', function(e) {
   }
 });
 
+// Paste image from clipboard (Ctrl + V)
+document.addEventListener('paste', function(e) {
+  const items = e.clipboardData.items;
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].type.indexOf('image') !== -1) {
+      const blob = items[i].getAsFile();
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        uploadedImageURL = ev.target.result;
+        generateReport();
+        // Optional: Show feedback
+        uploadArea.style.borderColor = '#22c55e';
+        setTimeout(() => {
+          uploadArea.style.borderColor = '#94a3b8';
+        }, 1500);
+      };
+      reader.readAsDataURL(blob);
+      break;
+    }
+  }
+});
+
 function generateReport() {
   const mainDate = document.getElementById('mainDate').value || '01-Apr-2026';
   const oneDate = document.getElementById('oneDate').value || '01-Apr-2026';
 
-  // Inward
+  // Inward calculations
   const inItems = [
     {code:"20FR", qty: parseInt(document.getElementById('in20fr').value)||0},
     {code:"20GP", qty: parseInt(document.getElementById('in20gp').value)||0},
@@ -210,7 +265,7 @@ function generateReport() {
     }
   });
 
-  // Outward
+  // Outward calculations
   const outItems = [
     {code:"20FR", qty: parseInt(document.getElementById('out20fr').value)||0},
     {code:"20GP", qty: parseInt(document.getElementById('out20gp').value)||0},
@@ -232,7 +287,7 @@ function generateReport() {
 
   const tableHTML = uploadedImageURL 
     ? `<img id="tableImage" src="${uploadedImageURL}" style="max-width:100%; height:auto;">`
-    : `<div class="placeholder">Upload your Daily Inventory Table here</div>`;
+    : `<div class="placeholder">Upload or Paste your Daily Inventory Table here</div>`;
 
   const fullHTML = `
     <div class="header">
@@ -262,7 +317,7 @@ function generateReport() {
 
 function downloadAsImage() {
   if (!uploadedImageURL) {
-    alert("Please upload the Daily Inventory Table image! [ ScreenShot Ekak Ghala Danna Table Eka Center Wenna Snip Karala ]");
+    alert("Please upload or paste the Daily Inventory Table image first!");
     return;
   }
 
@@ -276,13 +331,14 @@ function downloadAsImage() {
       useCORS: true
     }).then(canvas => {
       const link = document.createElement('a');
-      link.download = `McLarens_ONE_Report_${document.getElementById('mainDate').value || '01-Apr-2026'}.png`;
+      link.download = `McLarens_ONE_Report_${document.getElementById('mainDate').value || '01-April-2026'}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     });
-  }, 1200);
+  }, 800);
 }
 
+// Initial load
 window.onload = generateReport;
 </script>
 
