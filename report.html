@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>McLarens ONE Daily Inventory Report</title>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     body {
       font-family: 'Georgia', serif;
@@ -82,7 +83,7 @@
     .upload-area {
       border: 2px dashed #94a3b8;
       border-radius: 10px;
-      padding: 40px 20px;
+      padding: 25px 20px;
       text-align: center;
       background: #f8fafc;
       margin: 15px 0;
@@ -94,9 +95,12 @@
       background: #f0f4ff;
     }
     .upload-area p {
-      margin: 10px 0 5px;
+      margin: 8px 0 5px;
       color: #475569;
-      font-size: 1.1em;
+      font-size: 1.05em;
+    }
+    .excel-section {
+      margin: 25px 0;
     }
     button {
       background: #1e40af;
@@ -139,6 +143,11 @@
       border: 2px dashed #cbd5e1;
       border-radius: 8px;
     }
+    .status {
+      font-size: 0.95em;
+      color: #22c55e;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
@@ -149,10 +158,30 @@
     <label>Main Report Date</label>
     <input type="text" id="mainDate" value="01-April-2026">
 
-    <label>ONE Movement Reports Date</label>
+    <label>ONE Movement Reports Date (This Always Need To Be previous Date)</label>
     <input type="text" id="oneDate" value="01-April-2026">
 
-    <h3>ONE Inward At</h3>
+    <h3 style="margin-top:30px; color:#1e40af;"> Auto-Filler </h3>
+    
+    <div class="excel-section">
+      <label>Upload Inward </label>
+      <div class="upload-area" id="inwardUploadArea">
+        <p><strong>Click to choose rptdailyinward.xls</strong></p>
+        <input type="file" id="inwardExcel" accept=".xls,.xlsx" style="display:none;">
+      </div>
+      <div id="inwardStatus" class="status"></div>
+    </div>
+
+    <div class="excel-section">
+      <label>Upload Outward </label>
+      <div class="upload-area" id="outwardUploadArea">
+        <p><strong>Click to choose rptdailyoutward.xls</strong></p>
+        <input type="file" id="outwardExcel" accept=".xls,.xlsx" style="display:none;">
+      </div>
+      <div id="outwardStatus" class="status"></div>
+    </div>
+
+    <h3>ONE Inward At (Add manual if needed)</h3>
     <label>20FR</label><input type="number" id="in20fr" value="0">
     <label>20GP</label><input type="number" id="in20gp" value="0">
     <label>20RF</label><input type="number" id="in20rf" value="0">
@@ -162,7 +191,7 @@
     <label>40HCRF</label><input type="number" id="in40hcrf" value="0">
     <label>45HC</label><input type="number" id="in45hc" value="0">
 
-    <h3>ONE Outward At</h3>
+    <h3>ONE Outward At (Add manual if needed)</h3>
     <label>20FR</label><input type="number" id="out20fr" value="0">
     <label>20GP</label><input type="number" id="out20gp" value="0">
     <label>20RF</label><input type="number" id="out20rf" value="0">
@@ -172,7 +201,6 @@
     <label>40HCRF</label><input type="number" id="out40hcrf" value="0">
     <label>45HC</label><input type="number" id="out45hc" value="0">
 
-    <!-- Improved Image Upload Area -->
     <label style="margin-top: 25px;">Daily Inventory Table Image</label>
     <div class="upload-area" id="uploadArea">
       <p><strong>Click here to choose file</strong></p>
@@ -199,19 +227,69 @@ function pad(num) {
 
 let uploadedImageURL = null;
 
+
+async function parseExcelFile(file, type) { 
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 }); 
+
+    const counts = {
+      '20FR': 0, '20GP': 0, '20RF': 0,
+      '40FR': 0, '40GP': 0, '40HC': 0,
+      '40HCRF': 0, '45HC': 0
+    };
+
+    for (let i = 0; i < json.length; i++) {
+      const row = json[i];
+      if (!row || row.length < 5) continue;
+
+      let skip = false;
+
+      if (type === "inward") {
+        
+        if (i === 1) continue; 
+        const colP = String(row[15] || '').trim();
+        if (/^\d/.test(colP)) skip = true;
+      } 
+      else if (type === "outward") {
+        
+        if (i === 2) continue;
+        const colR = String(row[17] || '').trim();
+        if (/^\d/.test(colR)) skip = true;
+      }
+
+      if (skip) continue;
+
+      
+      const sizeType = String(row[4] || '').trim().toUpperCase();
+      
+      if (counts.hasOwnProperty(sizeType)) {
+        counts[sizeType]++;
+      }
+    }
+
+    return counts;
+  } catch (err) {
+    console.error(err);
+    alert("Error reading Excel file. Please make sure it's a valid .xls or .xlsx");
+    return null;
+  }
+}
+
+
 const uploadArea = document.getElementById('uploadArea');
 const fileInput = document.getElementById('imageUpload');
 
-// Click to choose file
-uploadArea.addEventListener('click', () => {
-  fileInput.click();
-});
+uploadArea.addEventListener('click', () => fileInput.click());
 
-fileInput.addEventListener('change', function(e) {
+fileInput.addEventListener('change', e => {
   const file = e.target.files[0];
   if (file) {
     const reader = new FileReader();
-    reader.onload = function(ev) {
+    reader.onload = ev => {
       uploadedImageURL = ev.target.result;
       generateReport();
     };
@@ -219,21 +297,17 @@ fileInput.addEventListener('change', function(e) {
   }
 });
 
-// Paste image from clipboard (Ctrl + V)
-document.addEventListener('paste', function(e) {
+document.addEventListener('paste', e => {
   const items = e.clipboardData.items;
   for (let i = 0; i < items.length; i++) {
     if (items[i].type.indexOf('image') !== -1) {
       const blob = items[i].getAsFile();
       const reader = new FileReader();
-      reader.onload = function(ev) {
+      reader.onload = ev => {
         uploadedImageURL = ev.target.result;
         generateReport();
-        // Optional: Show feedback
         uploadArea.style.borderColor = '#22c55e';
-        setTimeout(() => {
-          uploadArea.style.borderColor = '#94a3b8';
-        }, 1500);
+        setTimeout(() => uploadArea.style.borderColor = '#94a3b8', 1500);
       };
       reader.readAsDataURL(blob);
       break;
@@ -241,11 +315,64 @@ document.addEventListener('paste', function(e) {
   }
 });
 
-function generateReport() {
-  const mainDate = document.getElementById('mainDate').value || '01-Apr-2026';
-  const oneDate = document.getElementById('oneDate').value || '01-Apr-2026';
 
-  // Inward calculations
+const inwardUploadArea = document.getElementById('inwardUploadArea');
+const inwardFileInput = document.getElementById('inwardExcel');
+const inwardStatus = document.getElementById('inwardStatus');
+
+inwardUploadArea.addEventListener('click', () => inwardFileInput.click());
+
+inwardFileInput.addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  inwardStatus.textContent = ' Processing inward...';
+  const counts = await parseExcelFile(file, 'inward');
+  if (counts) {
+    document.getElementById('in20fr').value = counts['20FR'];
+    document.getElementById('in20gp').value = counts['20GP'];
+    document.getElementById('in20rf').value = counts['20RF'];
+    document.getElementById('in40fr').value = counts['40FR'];
+    document.getElementById('in40gp').value = counts['40GP'];
+    document.getElementById('in40hc').value = counts['40HC'];
+    document.getElementById('in40hcrf').value = counts['40HCRF'];
+    document.getElementById('in45hc').value = counts['45HC'];
+
+    inwardStatus.innerHTML = `Upload Success! (${Object.values(counts).reduce((a,b)=>a+b,0)} Containers Found)`;
+    generateReport();
+  }
+});
+
+const outwardUploadArea = document.getElementById('outwardUploadArea');
+const outwardFileInput = document.getElementById('outwardExcel');
+const outwardStatus = document.getElementById('outwardStatus');
+
+outwardUploadArea.addEventListener('click', () => outwardFileInput.click());
+
+outwardFileInput.addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  outwardStatus.textContent = ' Processing outward...';
+  const counts = await parseExcelFile(file, 'outward');
+  if (counts) {
+    document.getElementById('out20fr').value = counts['20FR'];
+    document.getElementById('out20gp').value = counts['20GP'];
+    document.getElementById('out20rf').value = counts['20RF'];
+    document.getElementById('out40fr').value = counts['40FR'];
+    document.getElementById('out40gp').value = counts['40GP'];
+    document.getElementById('out40hc').value = counts['40HC'];
+    document.getElementById('out40hcrf').value = counts['40HCRF'];
+    document.getElementById('out45hc').value = counts['45HC'];
+
+    outwardStatus.innerHTML = `Upload Success! (${Object.values(counts).reduce((a,b)=>a+b,0)} Containers Found)`;
+    generateReport();
+  }
+});
+
+
+function generateReport() {
+  const mainDate = document.getElementById('mainDate').value || '01-April-2026';
+  const oneDate = document.getElementById('oneDate').value || '01-April-2026';
+
   const inItems = [
     {code:"20FR", qty: parseInt(document.getElementById('in20fr').value)||0},
     {code:"20GP", qty: parseInt(document.getElementById('in20gp').value)||0},
@@ -265,7 +392,6 @@ function generateReport() {
     }
   });
 
-  // Outward calculations
   const outItems = [
     {code:"20FR", qty: parseInt(document.getElementById('out20fr').value)||0},
     {code:"20GP", qty: parseInt(document.getElementById('out20gp').value)||0},
@@ -299,14 +425,14 @@ function generateReport() {
 
     <hr>
 
-    <h2 style="text-align:center; margin:45px 0 18px; color:#1e3a8a;">ONE INWARD At</h2>
+    <h2 style="text-align:center; margin:45px 0 18px; color:#1e3a8a;">ONE INWARD AT</h2>
     <p style="text-align:center; font-size:1.25em;">${oneDate}</p>
     <ul>${inwardList || '<li style="color:#64748b;">No items</li>'}</ul>
     <div class="total">TOTAL = ${inTotal}</div>
 
     <hr>
 
-    <h2 style="text-align:center; margin:45px 0 18px; color:#1e3a8a;">ONE OUTWARD At</h2>
+    <h2 style="text-align:center; margin:45px 0 18px; color:#1e3a8a;">ONE OUTWARD AT</h2>
     <p style="text-align:center; font-size:1.25em;">${oneDate}</p>
     <ul>${outwardList || '<li style="color:#64748b;">No items</li>'}</ul>
     <div class="total">TOTAL = ${outTotal}</div>
@@ -322,7 +448,6 @@ function downloadAsImage() {
   }
 
   const outputDiv = document.getElementById('output');
-
   setTimeout(() => {
     html2canvas(outputDiv, {
       scale: 3.0,
@@ -331,14 +456,13 @@ function downloadAsImage() {
       useCORS: true
     }).then(canvas => {
       const link = document.createElement('a');
-      link.download = `McLarens_ONE_Report_${document.getElementById('mainDate').value || '01-April-2026'}.png`;
+      link.download = `McLarens_ONE_Report_${document.getElementById('mainDate').value || '01-Apr-2026'}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     });
   }, 800);
 }
 
-// Initial load
 window.onload = generateReport;
 </script>
 
