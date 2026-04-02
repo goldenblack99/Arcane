@@ -137,6 +137,7 @@
     <label>20FR</label><input type="number" id="in20fr" value="0">
     <label>20GP</label><input type="number" id="in20gp" value="0">
     <label>20RF</label><input type="number" id="in20rf" value="0">
+    <label>40FR</label><input type="number" id="in40fr" value="0">
     <label>40GP</label><input type="number" id="in40gp" value="0">
     <label>40HC</label><input type="number" id="in40hc" value="0">
     <label>40HCRF</label><input type="number" id="in40hcrf" value="0">
@@ -146,6 +147,7 @@
     <label>20FR</label><input type="number" id="out20fr" value="0">
     <label>20GP</label><input type="number" id="out20gp" value="0">
     <label>20RF</label><input type="number" id="out20rf" value="0">
+    <label>40FR</label><input type="number" id="out40fr" value="0">
     <label>40GP</label><input type="number" id="out40gp" value="0">
     <label>40HC</label><input type="number" id="out40hc" value="0">
     <label>40HCRF</label><input type="number" id="out40hcrf" value="0">
@@ -193,6 +195,7 @@ function generateReport() {
     {code:"20FR", qty: parseInt(document.getElementById('in20fr').value)||0},
     {code:"20GP", qty: parseInt(document.getElementById('in20gp').value)||0},
     {code:"20RF", qty: parseInt(document.getElementById('in20rf').value)||0},
+    {code:"40FR", qty: parseInt(document.getElementById('in40fr').value)||0},
     {code:"40GP", qty: parseInt(document.getElementById('in40gp').value)||0},
     {code:"40HC", qty: parseInt(document.getElementById('in40hc').value)||0},
     {code:"40HCRF", qty: parseInt(document.getElementById('in40hcrf').value)||0},
@@ -212,6 +215,7 @@ function generateReport() {
     {code:"20FR", qty: parseInt(document.getElementById('out20fr').value)||0},
     {code:"20GP", qty: parseInt(document.getElementById('out20gp').value)||0},
     {code:"20RF", qty: parseInt(document.getElementById('out20rf').value)||0},
+    {code:"40FR", qty: parseInt(document.getElementById('out40fr').value)||0},
     {code:"40GP", qty: parseInt(document.getElementById('out40gp').value)||0},
     {code:"40HC", qty: parseInt(document.getElementById('out40hc').value)||0},
     {code:"40HCRF", qty: parseInt(document.getElementById('out40hcrf').value)||0},
@@ -228,12 +232,12 @@ function generateReport() {
 
   const tableHTML = uploadedImageURL 
     ? `<img id="tableImage" src="${uploadedImageURL}" style="max-width:100%; height:auto;">`
-    : `<div class="placeholder">Upload your Daily Inventory Table image here</div>`;
+    : `<div class="placeholder">Upload your Daily Inventory Table here</div>`;
 
   const fullHTML = `
     <div class="header">
       <h1>McLARENS CONTAINERS (PVT) LTD</h1>
-      <div class="main-date">ONE DAILY INVENTORY REPORT AT ${mainDate}</div>
+      <div class="main-date">ONE DAILY INVENTORY REPORT AS AT ${mainDate}</div>
     </div>
 
     ${tableHTML}
