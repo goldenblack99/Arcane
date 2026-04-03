@@ -7,29 +7,117 @@
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    /* Your existing styles remain unchanged */
-    body { font-family: 'Georgia', serif; background: #f4f6f9; padding: 30px; display: flex; justify-content: center; }
-    .container { background: white; width: 100%; max-width: 1100px; padding: 50px 45px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e0e6f0; border-radius: 8px; }
+    body {
+      font-family: 'Georgia', serif;
+      background: #f4f6f9;
+      padding: 30px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      background: white;
+      width: 100%;
+      max-width: 1100px;
+      padding: 50px 45px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      border: 1px solid #e0e6f0;
+      border-radius: 8px;
+    }
     .header { text-align: center; margin-bottom: 40px; }
     .header h1 { margin: 0 0 8px; color: #1e3a8a; font-size: 1.55em; letter-spacing: 1px; }
     .main-date { font-size: 1.4em; color: #1e40af; font-weight: bold; margin: 10px 0 40px; }
+
     hr { border: none; border-top: 2px solid #cbd5e1; margin: 45px 0; }
     ul { list-style: none; padding: 0; margin: 18px 0; }
     li { margin: 13px 0; font-size: 1.18em; }
     .total { text-align: right; font-weight: bold; font-size: 1.45em; color: #1e3a8a; margin-top: 25px; }
-    .input-area { background: #f8fafc; padding: 30px; border-radius: 10px; margin-bottom: 45px; border: 1px solid #e2e8f0; }
-    label { display: block; margin: 14px 0 7px; font-weight: bold; color: #334155; }
-    input[type="text"], input[type="number"] { width: 100%; padding: 11px; font-size: 1.05em; border: 1px solid #94a3b8; border-radius: 6px; }
-    .upload-area { border: 2px dashed #94a3b8; border-radius: 10px; padding: 25px 20px; text-align: center; background: #f8fafc; margin: 15px 0; cursor: pointer; transition: all 0.3s; }
-    .upload-area:hover { border-color: #1e40af; background: #f0f4ff; }
-    .upload-area p { margin: 8px 0 5px; color: #475569; font-size: 1.05em; }
-    button { background: #1e40af; color: white; padding: 13px 28px; font-size: 1.08em; border: none; border-radius: 6px; cursor: pointer; margin: 12px 6px; }
+
+    .input-area {
+      background: #f8fafc;
+      padding: 30px;
+      border-radius: 10px;
+      margin-bottom: 45px;
+      border: 1px solid #e2e8f0;
+    }
+    label {
+      display: block;
+      margin: 14px 0 7px;
+      font-weight: bold;
+      color: #334155;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 11px;
+      font-size: 1.05em;
+      border: 1px solid #94a3b8;
+      border-radius: 6px;
+    }
+
+    .upload-area {
+      border: 2px dashed #94a3b8;
+      border-radius: 10px;
+      padding: 35px 20px;
+      text-align: center;
+      background: #f8fafc;
+      margin: 15px 0;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .upload-area:hover {
+      border-color: #1e40af;
+      background: #f0f4ff;
+    }
+    .upload-area.has-image {
+      border-color: #22c55e;
+      background: #f0fdf4;
+    }
+    .upload-area p {
+      margin: 8px 0 5px;
+      color: #475569;
+      font-size: 1.05em;
+    }
+
+    button {
+      background: #1e40af;
+      color: white;
+      padding: 13px 28px;
+      font-size: 1.08em;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 12px 6px;
+    }
     button:hover { background: #1e3a8a; }
-    .download-btn { background: #1e40af; width: 100%; padding: 18px; font-size: 1.25em; margin-top: 35px; }
-    .report-section { border: 2px solid #1e40af; padding: 45px; background: white; border-radius: 8px; }
-    #tableImage { max-width: 100%; height: auto; display: block; margin: 35px auto; border: 1px solid #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-    .placeholder { text-align: center; color: #64748b; font-style: italic; padding: 80px 20px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 8px; }
-    .status { font-size: 0.95em; color: #22c55e; margin-top: 5px; }
+
+    .download-btn {
+      background: #1e40af;
+      width: 100%;
+      padding: 18px;
+      font-size: 1.25em;
+      margin-top: 35px;
+    }
+
+    .report-section {
+      border: 2px solid #1e40af;
+      padding: 45px;
+      background: white;
+      border-radius: 8px;
+    }
+    #tableImage {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 35px auto;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    .status {
+      font-size: 0.95em;
+      color: #22c55e;
+      margin-top: 8px;
+    }
+    .error { color: #ef4444; }
   </style>
 </head>
 <body>
@@ -40,30 +128,32 @@
     <label>Main Report Date</label>
     <input type="text" id="mainDate" value="01-April-2026">
 
-    <label>ONE Movement Reports Date (This Always Need To Be previous Date)</label>
+    <label>ONE Movement Reports Date (Previous Date)</label>
     <input type="text" id="oneDate" value="01-April-2026">
 
     <h3 style="margin-top:30px; color:#1e40af;"> Auto-Filler </h3>
     
+    <!-- Inward Upload -->
     <div class="excel-section">
-      <label>Upload Inward </label>
+      <label>Upload Inward (rptdailyinward.xls)</label>
       <div class="upload-area" id="inwardUploadArea">
-        <p><strong>Click to choose rptdailyinward.xls</strong></p>
+        <p><strong>Click to choose file</strong></p>
         <input type="file" id="inwardExcel" accept=".xls,.xlsx" style="display:none;">
       </div>
       <div id="inwardStatus" class="status"></div>
     </div>
 
+    <!-- Outward Upload -->
     <div class="excel-section">
-      <label>Upload Outward </label>
+      <label>Upload Outward (rptdailyoutward.xls)</label>
       <div class="upload-area" id="outwardUploadArea">
-        <p><strong>Click to choose rptdailyoutward.xls</strong></p>
+        <p><strong>Click to choose file</strong></p>
         <input type="file" id="outwardExcel" accept=".xls,.xlsx" style="display:none;">
       </div>
       <div id="outwardStatus" class="status"></div>
     </div>
 
-    <h3>ONE Inward At (Add manual if needed)</h3>
+    <h3>ONE Inward At (Manual if needed)</h3>
     <label>20FR</label><input type="number" id="in20fr" value="0">
     <label>20GP</label><input type="number" id="in20gp" value="0">
     <label>20RF</label><input type="number" id="in20rf" value="0">
@@ -73,7 +163,7 @@
     <label>40HCRF</label><input type="number" id="in40hcrf" value="0">
     <label>45HC</label><input type="number" id="in45hc" value="0">
 
-    <h3>ONE Outward At (Add manual if needed)</h3>
+    <h3>ONE Outward At (Manual if needed)</h3>
     <label>20FR</label><input type="number" id="out20fr" value="0">
     <label>20GP</label><input type="number" id="out20gp" value="0">
     <label>20RF</label><input type="number" id="out20rf" value="0">
@@ -83,15 +173,17 @@
     <label>40HCRF</label><input type="number" id="out40hcrf" value="0">
     <label>45HC</label><input type="number" id="out45hc" value="0">
 
-    <label style="margin-top: 25px;">Daily Inventory Table Image</label>
-    <div class="upload-area" id="uploadArea">
-      <p><strong>Click here to choose file</strong></p>
-      <p>OR</p>
-      <p><strong>Press Ctrl + V</strong> to paste image from clipboard</p>
-      <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+    <!-- FIXED TABLE IMAGE SECTION -->
+    <label style="margin-top: 30px; font-size:1.1em;">Daily Inventory Table Screenshot</label>
+    <div class="upload-area" id="tableUploadArea">
+      <p><strong>Click here to select screenshot</strong></p>
+      <p style="color:#64748b; margin:10px 0;">OR</p>
+      <p><strong>Press Ctrl + V</strong> to paste screenshot directly from clipboard</p>
+      <input type="file" id="imageUpload" accept="image/*" style="display:none;">
     </div>
+    <div id="tableStatus" class="status"></div>
 
-    <button onclick="generateReport()">Generate Report</button>
+    <button onclick="generateReport()" style="margin-top:20px;">Generate Report</button>
   </div>
 
   <div id="output" class="report-section"></div>
@@ -103,12 +195,7 @@
 </div>
 
 <script>
-function pad(num) {
-  return String(num || 0).padStart(2, '0');
-}
-
-let uploadedImageURL = null;
-
+// ================== EXCEL PARSING (unchanged from previous fix) ==================
 async function parseExcelFile(file, type) { 
   try {
     const arrayBuffer = await file.arrayBuffer();
@@ -117,37 +204,27 @@ async function parseExcelFile(file, type) {
     const worksheet = workbook.Sheets[sheetName];
     const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 }); 
 
-    const counts = {
-      '20FR': 0, '20GP': 0, '20RF': 0,
-      '40FR': 0, '40GP': 0, '40HC': 0,
-      '40HCRF': 0, '45HC': 0
-    };
-
-    let totalProcessed = 0;
+    const counts = {'20FR':0,'20GP':0,'20RF':0,'40FR':0,'40GP':0,'40HC':0,'40HCRF':0,'45HC':0};
     let filteredRemoved = 0;
 
     for (let i = 0; i < json.length; i++) {
       const row = json[i];
-      if (!row || row.length < 18) continue;   // ensure enough columns
+      if (!row || row.length < 18) continue;
 
       let skip = false;
 
       if (type === "inward") {
-        if (i === 1) continue; 
-
-        const colP = String(row[15] || '').trim();   // Column P
-        const colL = String(row[11] || '').trim().toUpperCase(); // Column L
-
+        if (i === 1) continue;
+        const colP = String(row[15] || '').trim();
+        const colL = String(row[11] || '').trim().toUpperCase();
         if (/^\d/.test(colP) && colL.includes("OCEAN NETWORK EXPRESS")) {
           skip = true;
         }
       } 
       else if (type === "outward") {
         if (i === 2) continue;
-
-        const colR = String(row[17] || '').trim();   // Column R
-        const colN = String(row[13] || '').trim().toUpperCase(); // Column N
-
+        const colR = String(row[17] || '').trim();
+        const colN = String(row[13] || '').trim().toUpperCase();
         if (/^\d/.test(colR) && colN.includes("OCEAN NETWORK EXPRESS")) {
           skip = true;
         }
@@ -158,26 +235,68 @@ async function parseExcelFile(file, type) {
         continue;
       }
 
-      totalProcessed++;
-
       const sizeType = String(row[4] || '').trim().toUpperCase();
-      
       if (counts.hasOwnProperty(sizeType)) {
         counts[sizeType]++;
       }
     }
 
-    return { counts, totalProcessed, filteredRemoved };
+    const added = Object.values(counts).reduce((a,b) => a + b, 0);
+    return { counts, added, filteredRemoved };
 
   } catch (err) {
     console.error(err);
-    alert("Error reading Excel file. Please make sure it's a valid .xls or .xlsx");
+    alert("Error reading Excel file.");
     return null;
   }
 }
 
-// ... (Upload handlers for image remain the same) ...
+// ================== TABLE IMAGE HANDLING - FIXED & IMPROVED ==================
+let uploadedImageURL = null;
 
+const tableUploadArea = document.getElementById('tableUploadArea');
+const imageFileInput = document.getElementById('imageUpload');
+const tableStatus = document.getElementById('tableStatus');
+
+function setImage(src) {
+  uploadedImageURL = src;
+  tableUploadArea.classList.add('has-image');
+  tableStatus.innerHTML = `<span style="color:#22c55e;">✓ Screenshot loaded successfully</span>`;
+  generateReport();
+}
+
+// Click to upload
+tableUploadArea.addEventListener('click', () => imageFileInput.click());
+
+imageFileInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = ev => setImage(ev.target.result);
+    reader.readAsDataURL(file);
+  }
+});
+
+// Paste from clipboard (Ctrl + V) - Fixed
+document.addEventListener('paste', e => {
+  const items = e.clipboardData.items;
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].type.indexOf('image') !== -1) {
+      const blob = items[i].getAsFile();
+      const reader = new FileReader();
+      reader.onload = ev => {
+        setImage(ev.target.result);
+        // Visual feedback
+        tableUploadArea.style.borderColor = '#22c55e';
+        setTimeout(() => tableUploadArea.style.borderColor = '', 1200);
+      };
+      reader.readAsDataURL(blob);
+      break;
+    }
+  }
+});
+
+// ================== EXCEL UPLOADS (Inward & Outward) ==================
 const inwardUploadArea = document.getElementById('inwardUploadArea');
 const inwardFileInput = document.getElementById('inwardExcel');
 const inwardStatus = document.getElementById('inwardStatus');
@@ -187,13 +306,10 @@ inwardUploadArea.addEventListener('click', () => inwardFileInput.click());
 inwardFileInput.addEventListener('change', async e => {
   const file = e.target.files[0];
   if (!file) return;
-  inwardStatus.textContent = ' Processing inward...';
-  
+  inwardStatus.textContent = 'Processing inward...';
   const result = await parseExcelFile(file, 'inward');
   if (result) {
-    const { counts, totalProcessed, filteredRemoved } = result;
-
-    // Fill the input fields
+    const { counts, added, filteredRemoved } = result;
     document.getElementById('in20fr').value = counts['20FR'];
     document.getElementById('in20gp').value = counts['20GP'];
     document.getElementById('in20rf').value = counts['20RF'];
@@ -203,17 +319,15 @@ inwardFileInput.addEventListener('change', async e => {
     document.getElementById('in40hcrf').value = counts['40HCRF'];
     document.getElementById('in45hc').value = counts['45HC'];
 
-    const added = Object.values(counts).reduce((a,b)=>a+b,0);
-    
     inwardStatus.innerHTML = `
       Success! <strong>${added}</strong> containers added<br>
-      <span style="color:#ef4444;">${filteredRemoved}</span> containers filtered & removed 
-      (ONE + starts with 2 in P column)
+      <span style="color:#ef4444;">${filteredRemoved}</span> filtered & removed
     `;
     generateReport();
   }
 });
 
+// Outward (same logic)
 const outwardUploadArea = document.getElementById('outwardUploadArea');
 const outwardFileInput = document.getElementById('outwardExcel');
 const outwardStatus = document.getElementById('outwardStatus');
@@ -223,12 +337,10 @@ outwardUploadArea.addEventListener('click', () => outwardFileInput.click());
 outwardFileInput.addEventListener('change', async e => {
   const file = e.target.files[0];
   if (!file) return;
-  outwardStatus.textContent = ' Processing outward...';
-  
+  outwardStatus.textContent = 'Processing outward...';
   const result = await parseExcelFile(file, 'outward');
   if (result) {
-    const { counts, totalProcessed, filteredRemoved } = result;
-
+    const { counts, added, filteredRemoved } = result;
     document.getElementById('out20fr').value = counts['20FR'];
     document.getElementById('out20gp').value = counts['20GP'];
     document.getElementById('out20rf').value = counts['20RF'];
@@ -238,37 +350,28 @@ outwardFileInput.addEventListener('change', async e => {
     document.getElementById('out40hcrf').value = counts['40HCRF'];
     document.getElementById('out45hc').value = counts['45HC'];
 
-    const added = Object.values(counts).reduce((a,b)=>a+b,0);
-    
     outwardStatus.innerHTML = `
       Success! <strong>${added}</strong> containers added<br>
-      <span style="color:#ef4444;">${filteredRemoved}</span> containers filtered & removed 
-      (ONE + starts with 2 in R column)
+      <span style="color:#ef4444;">${filteredRemoved}</span> filtered & removed
     `;
     generateReport();
   }
 });
 
-// Rest of your code (generateReport, downloadAsImage, paste handler, etc.) remains unchanged
-// ... (copy the rest of your original script here)
+// ================== GENERATE & DOWNLOAD ==================
+function pad(num) {
+  return String(num || 0).padStart(2, '0');
+}
 
 function generateReport() {
-  // Your existing generateReport function - no changes needed
   const mainDate = document.getElementById('mainDate').value || '01-April-2026';
   const oneDate = document.getElementById('oneDate').value || '01-April-2026';
 
-  const inItems = [
-    {code:"20FR", qty: parseInt(document.getElementById('in20fr').value)||0},
-    {code:"20GP", qty: parseInt(document.getElementById('in20gp').value)||0},
-    {code:"20RF", qty: parseInt(document.getElementById('in20rf').value)||0},
-    {code:"40FR", qty: parseInt(document.getElementById('in40fr').value)||0},
-    {code:"40GP", qty: parseInt(document.getElementById('in40gp').value)||0},
-    {code:"40HC", qty: parseInt(document.getElementById('in40hc').value)||0},
-    {code:"40HCRF", qty: parseInt(document.getElementById('in40hcrf').value)||0},
-    {code:"45HC", qty: parseInt(document.getElementById('in45hc').value)||0}
-  ];
+  const inItems = ["20FR","20GP","20RF","40FR","40GP","40HC","40HCRF","45HC"].map(code => ({
+    code, qty: parseInt(document.getElementById('in'+code.toLowerCase()).value)||0
+  }));
 
-  let inwardList = ''; let inTotal = 0;
+  let inwardList = '', inTotal = 0;
   inItems.forEach(item => {
     if (item.qty > 0) {
       inwardList += `<li>• ${item.code} - ${pad(item.qty)}</li>`;
@@ -276,18 +379,11 @@ function generateReport() {
     }
   });
 
-  const outItems = [
-    {code:"20FR", qty: parseInt(document.getElementById('out20fr').value)||0},
-    {code:"20GP", qty: parseInt(document.getElementById('out20gp').value)||0},
-    {code:"20RF", qty: parseInt(document.getElementById('out20rf').value)||0},
-    {code:"40FR", qty: parseInt(document.getElementById('out40fr').value)||0},
-    {code:"40GP", qty: parseInt(document.getElementById('out40gp').value)||0},
-    {code:"40HC", qty: parseInt(document.getElementById('out40hc').value)||0},
-    {code:"40HCRF", qty: parseInt(document.getElementById('out40hcrf').value)||0},
-    {code:"45HC", qty: parseInt(document.getElementById('out45hc').value)||0}
-  ];
+  const outItems = ["20FR","20GP","20RF","40FR","40GP","40HC","40HCRF","45HC"].map(code => ({
+    code, qty: parseInt(document.getElementById('out'+code.toLowerCase()).value)||0
+  }));
 
-  let outwardList = ''; let outTotal = 0;
+  let outwardList = '', outTotal = 0;
   outItems.forEach(item => {
     if (item.qty > 0) {
       outwardList += `<li>• ${item.code} - ${pad(item.qty)}</li>`;
@@ -297,25 +393,24 @@ function generateReport() {
 
   const tableHTML = uploadedImageURL 
     ? `<img id="tableImage" src="${uploadedImageURL}" style="max-width:100%; height:auto;">`
-    : `<div class="placeholder">Upload or Paste your Daily Inventory Table here</div>`;
+    : `<div class="placeholder" style="padding:80px 20px; border:2px dashed #cbd5e1; border-radius:8px; text-align:center; color:#64748b;">
+         <p>Daily Inventory Table Screenshot will appear here</p>
+         <p style="font-size:0.95em;">(Paste with Ctrl+V or click above to upload)</p>
+       </div>`;
 
   const fullHTML = `
     <div class="header">
       <h1>McLARENS CONTAINERS (PVT) LTD</h1>
       <div class="main-date">ONE DAILY INVENTORY REPORT AS AT ${mainDate}</div>
     </div>
-
     ${tableHTML}
-
     <hr>
-
     <h2 style="text-align:center; margin:45px 0 18px; color:#1e3a8a;">ONE INWARD AT</h2>
     <p style="text-align:center; font-size:1.25em;">${oneDate}</p>
     <ul>${inwardList || '<li style="color:#64748b;">No items</li>'}</ul>
     <div class="total">TOTAL = ${inTotal}</div>
 
     <hr>
-
     <h2 style="text-align:center; margin:45px 0 18px; color:#1e3a8a;">ONE OUTWARD AT</h2>
     <p style="text-align:center; font-size:1.25em;">${oneDate}</p>
     <ul>${outwardList || '<li style="color:#64748b;">No items</li>'}</ul>
@@ -327,24 +422,17 @@ function generateReport() {
 
 function downloadAsImage() {
   if (!uploadedImageURL) {
-    alert("Please upload or paste the Daily Inventory Table image first!");
+    alert("Please paste or upload the Daily Inventory Table screenshot first!");
     return;
   }
 
   const outputDiv = document.getElementById('output');
-  setTimeout(() => {
-    html2canvas(outputDiv, {
-      scale: 3.0,
-      backgroundColor: "#ffffff",
-      allowTaint: true,
-      useCORS: true
-    }).then(canvas => {
-      const link = document.createElement('a');
-      link.download = `McLarens_ONE_Report_${document.getElementById('mainDate').value || '01-Apr-2026'}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    });
-  }, 800);
+  html2canvas(outputDiv, { scale: 3.0, backgroundColor: "#ffffff" }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = `McLarens_ONE_Report_${document.getElementById('mainDate').value.replace(/[^a-zA-Z0-9]/g,'')}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
 }
 
 window.onload = generateReport;
