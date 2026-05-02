@@ -8,7 +8,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     body {
-      font-family: 'Georgia', serif;
+      font-family: 'Roboto', serif;
       background: #f4f6f9;
       padding: 30px;
       display: flex;
@@ -71,11 +71,6 @@
       border-color: #22c55e;
       background: #f0fdf4;
     }
-    .upload-area p {
-      margin: 8px 0 5px;
-      color: #475569;
-      font-size: 1.05em;
-    }
 
     button {
       background: #1e40af;
@@ -112,11 +107,33 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
 
-    .status {
-      font-size: 0.95em;
-      color: #22c55e;
-      margin-top: 8px;
+    .filtered-section {
+      margin-top: 40px;
+      padding: 25px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
     }
+    .filtered-section h3 {
+      color: #1e3a8a;
+      margin-bottom: 15px;
+    }
+    .filtered-list {
+      max-height: 350px;
+      overflow-y: auto;
+      background: white;
+      padding: 15px;
+      border-radius: 6px;
+      font-size: 0.95em;
+      line-height: 1.6;
+    }
+    .filtered-item {
+      padding: 6px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .filtered-item:last-child { border-bottom: none; }
+
+    .status { font-size: 0.95em; color: #22c55e; margin-top: 8px; }
     .error { color: #ef4444; }
   </style>
 </head>
@@ -126,10 +143,10 @@
 
   <div class="input-area">
     <label>Main Report Date</label>
-    <input type="text" id="mainDate" value="01-April-2026">
+    <input type="text" id="mainDate" value="02-March-2026">
 
     <label>ONE Movement Reports Date (Previous Date)</label>
-    <input type="text" id="oneDate" value="01-April-2026">
+    <input type="text" id="oneDate" value="01-March-2026">
 
     <h3 style="margin-top:30px; color:#1e40af;"> Auto-Filler </h3>
     
@@ -191,10 +208,29 @@
     Download Report as Image :)
   </button>
 
+  <!-- ==================== FILTERED DATA SECTION ==================== -->
+  <div class="filtered-section">
+    <h3>Filtered / Removed Containers (ONE)</h3>
+    
+    <div id="filteredInward" style="margin-bottom:30px;">
+      <strong>INWARD Filtered:</strong> <span id="inwardFilteredCount">0</span> containers
+      <div id="inwardFilteredList" class="filtered-list"></div>
+    </div>
+
+    <div id="filteredOutward">
+      <strong>OUTWARD Filtered:</strong> <span id="outwardFilteredCount">0</span> containers
+      <div id="outwardFilteredList" class="filtered-list"></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
-// ================== EXCEL PARSING - CORRECTED ==================
+// ================== GLOBAL VARIABLES ==================
+let filteredInwardData = [];
+let filteredOutwardData = [];
+
+// ================== EXCEL PARSING - UPDATED WITH REQUESTED COLUMNS ==================
 async function parseExcelFile(file, type) { 
   try {
     const arrayBuffer = await file.arrayBuffer();
@@ -205,33 +241,52 @@ async function parseExcelFile(file, type) {
 
     const counts = {'20FR':0,'20GP':0,'20RF':0,'40FR':0,'40GP':0,'40HC':0,'40HCRF':0,'45HC':0};
     let filteredRemoved = 0;
+    let filteredList = [];
 
     for (let i = 0; i < json.length; i++) {
       const row = json[i];
       if (!row || row.length < 18) continue;
 
       let skip = false;
+      let containerInfo = {};
 
       if (type === "inward") {
-        if (i === 1) continue;                    // Skip header row
+        if (i === 1) continue;                    // Skip header
         const colL = String(row[11] || '').trim().toUpperCase();   // Column L
         
-        // Filter & remove only OCEAN NETWORK EXPRESS (PVT) LTD in Column L
         if (colL.includes("OCEAN NETWORK EXPRESS")) {
           skip = true;
+          containerInfo = {
+            row: i + 1,
+            colD: String(row[3] || ''),   // D Column
+            colE: String(row[4] || ''),   // E Column (usually Size/Type)
+            colL: String(row[11] || ''),  // L Column
+            colM: String(row[12] || '')   // M Column
+          };
         }
       } 
       else if (type === "outward") {
         if (i === 2) continue;
         const colR = String(row[17] || '').trim();
         const colN = String(row[13] || '').trim().toUpperCase();
+        
         if (/^\d/.test(colR) && colN.includes("OCEAN NETWORK EXPRESS")) {
           skip = true;
+          containerInfo = {
+            row: i + 1,
+            colD: String(row[3] || ''),   // D Column
+            colE: String(row[4] || ''),   // E Column
+            colN: String(row[13] || ''),  // N Column
+            colO: String(row[14] || '')   // O Column
+          };
         }
       }
 
       if (skip) {
         filteredRemoved++;
+        if (Object.keys(containerInfo).length > 1) {
+          filteredList.push(containerInfo);
+        }
         continue;
       }
 
@@ -242,7 +297,11 @@ async function parseExcelFile(file, type) {
     }
 
     const added = Object.values(counts).reduce((a,b) => a + b, 0);
-    return { counts, added, filteredRemoved };
+    
+    if (type === "inward") filteredInwardData = filteredList;
+    else filteredOutwardData = filteredList;
+
+    return { counts, added, filteredRemoved, filteredList };
 
   } catch (err) {
     console.error(err);
@@ -251,7 +310,7 @@ async function parseExcelFile(file, type) {
   }
 }
 
-// ================== TABLE IMAGE HANDLING ==================
+// ================== Rest of the code remains the same (Image handling, uploads, etc.) ==================
 let uploadedImageURL = null;
 
 const tableUploadArea = document.getElementById('tableUploadArea');
@@ -282,18 +341,14 @@ document.addEventListener('paste', e => {
     if (items[i].type.indexOf('image') !== -1) {
       const blob = items[i].getAsFile();
       const reader = new FileReader();
-      reader.onload = ev => {
-        setImage(ev.target.result);
-        tableUploadArea.style.borderColor = '#22c55e';
-        setTimeout(() => tableUploadArea.style.borderColor = '', 1200);
-      };
+      reader.onload = ev => setImage(ev.target.result);
       reader.readAsDataURL(blob);
       break;
     }
   }
 });
 
-// ================== EXCEL UPLOADS ==================
+// Inward Upload
 const inwardUploadArea = document.getElementById('inwardUploadArea');
 const inwardFileInput = document.getElementById('inwardExcel');
 const inwardStatus = document.getElementById('inwardStatus');
@@ -307,23 +362,17 @@ inwardFileInput.addEventListener('change', async e => {
   const result = await parseExcelFile(file, 'inward');
   if (result) {
     const { counts, added, filteredRemoved } = result;
-    document.getElementById('in20fr').value = counts['20FR'];
-    document.getElementById('in20gp').value = counts['20GP'];
-    document.getElementById('in20rf').value = counts['20RF'];
-    document.getElementById('in40fr').value = counts['40FR'];
-    document.getElementById('in40gp').value = counts['40GP'];
-    document.getElementById('in40hc').value = counts['40HC'];
-    document.getElementById('in40hcrf').value = counts['40HCRF'];
-    document.getElementById('in45hc').value = counts['45HC'];
+    Object.keys(counts).forEach(code => {
+      const el = document.getElementById('in' + code.toLowerCase());
+      if (el) el.value = counts[code];
+    });
 
-    inwardStatus.innerHTML = `
-      Success! <strong>${added}</strong> containers added<br>
-      <span style="color:#ef4444;">${filteredRemoved}</span> filtered & removed
-    `;
+    inwardStatus.innerHTML = `Success! <strong>\<span style="color:#ef4444;">{filtered & Removed}</span>`;
     generateReport();
   }
 });
 
+// Outward Upload
 const outwardUploadArea = document.getElementById('outwardUploadArea');
 const outwardFileInput = document.getElementById('outwardExcel');
 const outwardStatus = document.getElementById('outwardStatus');
@@ -337,28 +386,17 @@ outwardFileInput.addEventListener('change', async e => {
   const result = await parseExcelFile(file, 'outward');
   if (result) {
     const { counts, added, filteredRemoved } = result;
-    document.getElementById('out20fr').value = counts['20FR'];
-    document.getElementById('out20gp').value = counts['20GP'];
-    document.getElementById('out20rf').value = counts['20RF'];
-    document.getElementById('out40fr').value = counts['40FR'];
-    document.getElementById('out40gp').value = counts['40GP'];
-    document.getElementById('out40hc').value = counts['40HC'];
-    document.getElementById('out40hcrf').value = counts['40HCRF'];
-    document.getElementById('out45hc').value = counts['45HC'];
+    Object.keys(counts).forEach(code => {
+      const el = document.getElementById('out' + code.toLowerCase());
+      if (el) el.value = counts[code];
+    });
 
-    outwardStatus.innerHTML = `
-      Success! <strong>${added}</strong> containers added<br>
-      <span style="color:#ef4444;">${filteredRemoved}</span> filtered & removed
-    `;
+    outwardStatus.innerHTML = `Success! <strong>\<span style="color:#ef4444;">{filtered & Removed}</span>`;
     generateReport();
   }
 });
 
-// ================== GENERATE & DOWNLOAD ==================
-function pad(num) {
-  return String(num || 0).padStart(2, '0');
-}
-
+// Generate Report
 function generateReport() {
   const mainDate = document.getElementById('mainDate').value || '01-April-2026';
   const oneDate = document.getElementById('oneDate').value || '01-April-2026';
@@ -370,7 +408,7 @@ function generateReport() {
   let inwardList = '', inTotal = 0;
   inItems.forEach(item => {
     if (item.qty > 0) {
-      inwardList += `<li>• ${item.code} - ${pad(item.qty)}</li>`;
+      inwardList += `<li>• ${item.code} - ${String(item.qty).padStart(2, '0')}</li>`;
       inTotal += item.qty;
     }
   });
@@ -382,7 +420,7 @@ function generateReport() {
   let outwardList = '', outTotal = 0;
   outItems.forEach(item => {
     if (item.qty > 0) {
-      outwardList += `<li>• ${item.code} - ${pad(item.qty)}</li>`;
+      outwardList += `<li>• ${item.code} - ${String(item.qty).padStart(2, '0')}</li>`;
       outTotal += item.qty;
     }
   });
@@ -414,6 +452,39 @@ function generateReport() {
   `;
 
   document.getElementById('output').innerHTML = fullHTML;
+  updateFilteredDisplay();
+}
+
+function updateFilteredDisplay() {
+  // Inward
+  document.getElementById('inwardFilteredCount').textContent = filteredInwardData.length;
+  let inwardHTML = '';
+  if (filteredInwardData.length === 0) {
+    inwardHTML = '<div style="color:#64748b;">No filtered containers</div>';
+  } else {
+    inwardHTML = filteredInwardData.map(item => `
+      <div class="filtered-item">
+        <strong>Row ${item.row}</strong><br>
+        D: ${item.colD} | E: ${item.colE} | L: ${item.colL} | M: ${item.colM}
+      </div>
+    `).join('');
+  }
+  document.getElementById('inwardFilteredList').innerHTML = inwardHTML;
+
+  // Outward
+  document.getElementById('outwardFilteredCount').textContent = filteredOutwardData.length;
+  let outwardHTML = '';
+  if (filteredOutwardData.length === 0) {
+    outwardHTML = '<div style="color:#64748b;">No filtered containers</div>';
+  } else {
+    outwardHTML = filteredOutwardData.map(item => `
+      <div class="filtered-item">
+        <strong>Row ${item.row}</strong><br>
+        D: ${item.colD} | E: ${item.colE} | N: ${item.colN} | O: ${item.colO}
+      </div>
+    `).join('');
+  }
+  document.getElementById('outwardFilteredList').innerHTML = outwardHTML;
 }
 
 function downloadAsImage() {
@@ -421,7 +492,6 @@ function downloadAsImage() {
     alert("Please paste or upload the Daily Inventory Table screenshot first!");
     return;
   }
-
   const outputDiv = document.getElementById('output');
   html2canvas(outputDiv, { scale: 3.0, backgroundColor: "#ffffff" }).then(canvas => {
     const link = document.createElement('a');
@@ -433,6 +503,5 @@ function downloadAsImage() {
 
 window.onload = generateReport;
 </script>
-
 </body>
 </html>
