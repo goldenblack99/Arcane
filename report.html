@@ -132,7 +132,6 @@
 
     <h3 style="margin-top:30px; color:#1e40af;"> Auto-Filler </h3>
     
-    <!-- Inward Upload -->
     <div class="excel-section">
       <label>Upload Inward (rptdailyinward.xls)</label>
       <div class="upload-area" id="inwardUploadArea">
@@ -142,7 +141,6 @@
       <div id="inwardStatus" class="status"></div>
     </div>
 
-    <!-- Outward Upload -->
     <div class="excel-section">
       <label>Upload Outward (rptdailyoutward.xls)</label>
       <div class="upload-area" id="outwardUploadArea">
@@ -193,17 +191,20 @@
 </div>
 
 <script>
-// ================== DATE FORMATTING ==================
+// ================== FIXED DATE FORMATTING ==================
 function getTodayFormatted() {
   const date = new Date();
   const day = String(date.getDate()).padStart(2, '0');
+  
   const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   const month = months[date.getMonth()];
+  
   const year = date.getFullYear();
+  
   return `\( {day}- \){month}-${year}`;
 }
 
-// ================== EXCEL PARSING ==================
+// ================== EXCEL PARSING (unchanged) ==================
 async function parseExcelFile(file, type) { 
   try {
     const arrayBuffer = await file.arrayBuffer();
@@ -258,7 +259,7 @@ async function parseExcelFile(file, type) {
   }
 }
 
-// ================== TABLE IMAGE HANDLING ==================
+// ================== Rest of the code (Image handling, Uploads, Generate) ==================
 let uploadedImageURL = null;
 
 const tableUploadArea = document.getElementById('tableUploadArea');
@@ -300,7 +301,7 @@ document.addEventListener('paste', e => {
   }
 });
 
-// ================== EXCEL UPLOADS ==================
+// Inward Upload
 const inwardUploadArea = document.getElementById('inwardUploadArea');
 const inwardFileInput = document.getElementById('inwardExcel');
 const inwardStatus = document.getElementById('inwardStatus');
@@ -328,6 +329,7 @@ inwardFileInput.addEventListener('change', async e => {
   }
 });
 
+// Outward Upload (unchanged)
 const outwardUploadArea = document.getElementById('outwardUploadArea');
 const outwardFileInput = document.getElementById('outwardExcel');
 const outwardStatus = document.getElementById('outwardStatus');
@@ -355,15 +357,15 @@ outwardFileInput.addEventListener('change', async e => {
   }
 });
 
-// ================== GENERATE REPORT ==================
 function pad(num) {
   return String(num || 0).padStart(2, '0');
 }
 
 function generateReport() {
-  const mainDate = document.getElementById('mainDate').value;
+  const mainDate = document.getElementById('mainDate').value || getTodayFormatted();
   const oneDate = document.getElementById('oneDate').value || '01-April-2026';
 
+  // ... (rest of generateReport remains same)
   const inItems = ["20FR","20GP","20RF","40FR","40GP","40HC","40HCRF","45HC"].map(code => ({
     code, qty: parseInt(document.getElementById('in'+code.toLowerCase()).value)||0
   }));
@@ -417,9 +419,10 @@ function generateReport() {
   document.getElementById('output').innerHTML = fullHTML;
 }
 
-// ================== AUTO SET MAIN DATE ON LOAD ==================
+// ================== AUTO SET DATE ON LOAD ==================
 window.onload = () => {
-  document.getElementById('mainDate').value = getTodayFormatted();
+  const today = getTodayFormatted();
+  document.getElementById('mainDate').value = today;
   generateReport();
 };
 </script>
