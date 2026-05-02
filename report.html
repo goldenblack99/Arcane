@@ -117,6 +117,7 @@
       color: #22c55e;
       margin-top: 8px;
     }
+    .error { color: #ef4444; }
   </style>
 </head>
 <body>
@@ -125,13 +126,14 @@
 
   <div class="input-area">
     <label>Main Report Date</label>
-    <input type="text" id="mainDate">
+    <input type="text" id="mainDate" value="01-April-2026">
 
     <label>ONE Movement Reports Date (Previous Date)</label>
     <input type="text" id="oneDate" value="01-April-2026">
 
     <h3 style="margin-top:30px; color:#1e40af;"> Auto-Filler </h3>
     
+    <!-- Inward Upload -->
     <div class="excel-section">
       <label>Upload Inward (rptdailyinward.xls)</label>
       <div class="upload-area" id="inwardUploadArea">
@@ -141,6 +143,7 @@
       <div id="inwardStatus" class="status"></div>
     </div>
 
+    <!-- Outward Upload -->
     <div class="excel-section">
       <label>Upload Outward (rptdailyoutward.xls)</label>
       <div class="upload-area" id="outwardUploadArea">
@@ -191,20 +194,7 @@
 </div>
 
 <script>
-// ================== FIXED DATE FORMATTING ==================
-function getTodayFormatted() {
-  const date = new Date();
-  const day = String(date.getDate()).padStart(2, '0');
-  
-  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const month = months[date.getMonth()];
-  
-  const year = date.getFullYear();
-  
-  return `\( {day}- \){month}-${year}`;
-}
-
-// ================== EXCEL PARSING (unchanged) ==================
+// ================== EXCEL PARSING - CORRECTED ==================
 async function parseExcelFile(file, type) { 
   try {
     const arrayBuffer = await file.arrayBuffer();
@@ -223,8 +213,10 @@ async function parseExcelFile(file, type) {
       let skip = false;
 
       if (type === "inward") {
-        if (i === 1) continue;
-        const colL = String(row[11] || '').trim().toUpperCase();
+        if (i === 1) continue;                    // Skip header row
+        const colL = String(row[11] || '').trim().toUpperCase();   // Column L
+        
+        // Filter & remove only OCEAN NETWORK EXPRESS (PVT) LTD in Column L
         if (colL.includes("OCEAN NETWORK EXPRESS")) {
           skip = true;
         }
@@ -259,7 +251,7 @@ async function parseExcelFile(file, type) {
   }
 }
 
-// ================== Rest of the code (Image handling, Uploads, Generate) ==================
+// ================== TABLE IMAGE HANDLING ==================
 let uploadedImageURL = null;
 
 const tableUploadArea = document.getElementById('tableUploadArea');
@@ -301,7 +293,7 @@ document.addEventListener('paste', e => {
   }
 });
 
-// Inward Upload
+// ================== EXCEL UPLOADS ==================
 const inwardUploadArea = document.getElementById('inwardUploadArea');
 const inwardFileInput = document.getElementById('inwardExcel');
 const inwardStatus = document.getElementById('inwardStatus');
@@ -324,12 +316,14 @@ inwardFileInput.addEventListener('change', async e => {
     document.getElementById('in40hcrf').value = counts['40HCRF'];
     document.getElementById('in45hc').value = counts['45HC'];
 
-    inwardStatus.innerHTML = `Success! <strong>\( {added}</strong> containers added<br><span style="color:#ef4444;"> \){filteredRemoved}</span> filtered & removed`;
+    inwardStatus.innerHTML = `
+      Success! <strong>${added}</strong> containers added<br>
+      <span style="color:#ef4444;">${filteredRemoved}</span> filtered & removed
+    `;
     generateReport();
   }
 });
 
-// Outward Upload (unchanged)
 const outwardUploadArea = document.getElementById('outwardUploadArea');
 const outwardFileInput = document.getElementById('outwardExcel');
 const outwardStatus = document.getElementById('outwardStatus');
@@ -352,20 +346,23 @@ outwardFileInput.addEventListener('change', async e => {
     document.getElementById('out40hcrf').value = counts['40HCRF'];
     document.getElementById('out45hc').value = counts['45HC'];
 
-    outwardStatus.innerHTML = `Success! <strong>\( {added}</strong> containers added<br><span style="color:#ef4444;"> \){filteredRemoved}</span> filtered & removed`;
+    outwardStatus.innerHTML = `
+      Success! <strong>${added}</strong> containers added<br>
+      <span style="color:#ef4444;">${filteredRemoved}</span> filtered & removed
+    `;
     generateReport();
   }
 });
 
+// ================== GENERATE & DOWNLOAD ==================
 function pad(num) {
   return String(num || 0).padStart(2, '0');
 }
 
 function generateReport() {
-  const mainDate = document.getElementById('mainDate').value || getTodayFormatted();
+  const mainDate = document.getElementById('mainDate').value || '01-April-2026';
   const oneDate = document.getElementById('oneDate').value || '01-April-2026';
 
-  // ... (rest of generateReport remains same)
   const inItems = ["20FR","20GP","20RF","40FR","40GP","40HC","40HCRF","45HC"].map(code => ({
     code, qty: parseInt(document.getElementById('in'+code.toLowerCase()).value)||0
   }));
@@ -419,12 +416,22 @@ function generateReport() {
   document.getElementById('output').innerHTML = fullHTML;
 }
 
-// ================== AUTO SET DATE ON LOAD ==================
-window.onload = () => {
-  const today = getTodayFormatted();
-  document.getElementById('mainDate').value = today;
-  generateReport();
-};
+function downloadAsImage() {
+  if (!uploadedImageURL) {
+    alert("Please paste or upload the Daily Inventory Table screenshot first!");
+    return;
+  }
+
+  const outputDiv = document.getElementById('output');
+  html2canvas(outputDiv, { scale: 3.0, backgroundColor: "#ffffff" }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = `McLarens_ONE_Report_${document.getElementById('mainDate').value.replace(/[^a-zA-Z0-9]/g,'')}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+}
+
+window.onload = generateReport;
 </script>
 
 </body>
