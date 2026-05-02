@@ -117,7 +117,6 @@
       color: #22c55e;
       margin-top: 8px;
     }
-    .error { color: #ef4444; }
   </style>
 </head>
 <body>
@@ -126,7 +125,7 @@
 
   <div class="input-area">
     <label>Main Report Date</label>
-    <input type="text" id="mainDate" value="01-April-2026">
+    <input type="text" id="mainDate">
 
     <label>ONE Movement Reports Date (Previous Date)</label>
     <input type="text" id="oneDate" value="01-April-2026">
@@ -173,7 +172,6 @@
     <label>40HCRF</label><input type="number" id="out40hcrf" value="0">
     <label>45HC</label><input type="number" id="out45hc" value="0">
 
-    <!-- FIXED TABLE IMAGE SECTION -->
     <label style="margin-top: 30px; font-size:1.1em;">Daily Inventory Table Screenshot</label>
     <div class="upload-area" id="tableUploadArea">
       <p><strong>Click here to select screenshot</strong></p>
@@ -195,7 +193,17 @@
 </div>
 
 <script>
-// ================== EXCEL PARSING (unchanged from previous fix) ==================
+// ================== DATE FORMATTING ==================
+function getTodayFormatted() {
+  const date = new Date();
+  const day = String(date.getDate()).padStart(2, '0');
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+  return `\( {day}- \){month}-${year}`;
+}
+
+// ================== EXCEL PARSING ==================
 async function parseExcelFile(file, type) { 
   try {
     const arrayBuffer = await file.arrayBuffer();
@@ -215,9 +223,8 @@ async function parseExcelFile(file, type) {
 
       if (type === "inward") {
         if (i === 1) continue;
-        const colP = String(row[15] || '').trim();
         const colL = String(row[11] || '').trim().toUpperCase();
-        if (/^\d/.test(colP) && colL.includes("OCEAN NETWORK EXPRESS")) {
+        if (colL.includes("OCEAN NETWORK EXPRESS")) {
           skip = true;
         }
       } 
@@ -251,7 +258,7 @@ async function parseExcelFile(file, type) {
   }
 }
 
-// ================== TABLE IMAGE HANDLING - FIXED & IMPROVED ==================
+// ================== TABLE IMAGE HANDLING ==================
 let uploadedImageURL = null;
 
 const tableUploadArea = document.getElementById('tableUploadArea');
@@ -265,7 +272,6 @@ function setImage(src) {
   generateReport();
 }
 
-// Click to upload
 tableUploadArea.addEventListener('click', () => imageFileInput.click());
 
 imageFileInput.addEventListener('change', e => {
@@ -277,7 +283,6 @@ imageFileInput.addEventListener('change', e => {
   }
 });
 
-// Paste from clipboard (Ctrl + V) - Fixed
 document.addEventListener('paste', e => {
   const items = e.clipboardData.items;
   for (let i = 0; i < items.length; i++) {
@@ -286,7 +291,6 @@ document.addEventListener('paste', e => {
       const reader = new FileReader();
       reader.onload = ev => {
         setImage(ev.target.result);
-        // Visual feedback
         tableUploadArea.style.borderColor = '#22c55e';
         setTimeout(() => tableUploadArea.style.borderColor = '', 1200);
       };
@@ -296,7 +300,7 @@ document.addEventListener('paste', e => {
   }
 });
 
-// ================== EXCEL UPLOADS (Inward & Outward) ==================
+// ================== EXCEL UPLOADS ==================
 const inwardUploadArea = document.getElementById('inwardUploadArea');
 const inwardFileInput = document.getElementById('inwardExcel');
 const inwardStatus = document.getElementById('inwardStatus');
@@ -319,15 +323,11 @@ inwardFileInput.addEventListener('change', async e => {
     document.getElementById('in40hcrf').value = counts['40HCRF'];
     document.getElementById('in45hc').value = counts['45HC'];
 
-    inwardStatus.innerHTML = `
-      Success! <strong>${added}</strong> containers added<br>
-      <span style="color:#ef4444;">${filteredRemoved}</span> filtered & removed
-    `;
+    inwardStatus.innerHTML = `Success! <strong>\( {added}</strong> containers added<br><span style="color:#ef4444;"> \){filteredRemoved}</span> filtered & removed`;
     generateReport();
   }
 });
 
-// Outward (same logic)
 const outwardUploadArea = document.getElementById('outwardUploadArea');
 const outwardFileInput = document.getElementById('outwardExcel');
 const outwardStatus = document.getElementById('outwardStatus');
@@ -350,21 +350,18 @@ outwardFileInput.addEventListener('change', async e => {
     document.getElementById('out40hcrf').value = counts['40HCRF'];
     document.getElementById('out45hc').value = counts['45HC'];
 
-    outwardStatus.innerHTML = `
-      Success! <strong>${added}</strong> containers added<br>
-      <span style="color:#ef4444;">${filteredRemoved}</span> filtered & removed
-    `;
+    outwardStatus.innerHTML = `Success! <strong>\( {added}</strong> containers added<br><span style="color:#ef4444;"> \){filteredRemoved}</span> filtered & removed`;
     generateReport();
   }
 });
 
-// ================== GENERATE & DOWNLOAD ==================
+// ================== GENERATE REPORT ==================
 function pad(num) {
   return String(num || 0).padStart(2, '0');
 }
 
 function generateReport() {
-  const mainDate = document.getElementById('mainDate').value || '01-April-2026';
+  const mainDate = document.getElementById('mainDate').value;
   const oneDate = document.getElementById('oneDate').value || '01-April-2026';
 
   const inItems = ["20FR","20GP","20RF","40FR","40GP","40HC","40HCRF","45HC"].map(code => ({
@@ -420,22 +417,11 @@ function generateReport() {
   document.getElementById('output').innerHTML = fullHTML;
 }
 
-function downloadAsImage() {
-  if (!uploadedImageURL) {
-    alert("Please paste or upload the Daily Inventory Table screenshot first!");
-    return;
-  }
-
-  const outputDiv = document.getElementById('output');
-  html2canvas(outputDiv, { scale: 3.0, backgroundColor: "#ffffff" }).then(canvas => {
-    const link = document.createElement('a');
-    link.download = `McLarens_ONE_Report_${document.getElementById('mainDate').value.replace(/[^a-zA-Z0-9]/g,'')}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  });
-}
-
-window.onload = generateReport;
+// ================== AUTO SET MAIN DATE ON LOAD ==================
+window.onload = () => {
+  document.getElementById('mainDate').value = getTodayFormatted();
+  generateReport();
+};
 </script>
 
 </body>
