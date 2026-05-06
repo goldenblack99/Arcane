@@ -9,28 +9,28 @@
   <style>
     body {
       font-family: 'Roboto', serif;
-      background: #f4f6f9;
+      background: #ffffff;
       padding: 30px;
       display: flex;
       justify-content: center;
     }
     .container {
-      background: white;
+      background: rgb(205, 205, 205);
       width: 100%;
       max-width: 1100px;
       padding: 50px 45px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
       border: 1px solid #e0e6f0;
       border-radius: 8px;
     }
     .header { text-align: center; margin-bottom: 40px; }
-    .header h1 { margin: 0 0 8px; color: #1e3a8a; font-size: 1.55em; letter-spacing: 1px; }
-    .main-date { font-size: 1.4em; color: #1e40af; font-weight: bold; margin: 10px 0 40px; }
+    .header h1 { margin: 0 0 8px; color: #000000; font-size: 1.55em; letter-spacing: 1px; }
+    .main-date { font-size: 1.4em; color: #000000; font-weight: bold; margin: 10px 0 40px; }
 
     hr { border: none; border-top: 2px solid #cbd5e1; margin: 45px 0; }
     ul { list-style: none; padding: 0; margin: 18px 0; }
     li { margin: 13px 0; font-size: 1.18em; }
-    .total { text-align: right; font-weight: bold; font-size: 1.45em; color: #1e3a8a; margin-top: 25px; }
+    .total { text-align: right; font-weight: bold; font-size: 1.45em; color: #000000; margin-top: 25px; }
 
     .input-area {
       background: #f8fafc;
@@ -64,16 +64,16 @@
       transition: all 0.3s;
     }
     .upload-area:hover {
-      border-color: #1e40af;
-      background: #f0f4ff;
+      border-color: #ff0000;
+      background: #d8d8d8;
     }
     .upload-area.has-image {
-      border-color: #22c55e;
-      background: #f0fdf4;
+      border-color: #00ff5e;
+      background: #a5a5a5;
     }
 
     button {
-      background: #1e40af;
+      background: #383838;
       color: white;
       padding: 13px 28px;
       font-size: 1.08em;
@@ -82,18 +82,20 @@
       cursor: pointer;
       margin: 12px 6px;
     }
-    button:hover { background: #1e3a8a; }
+    button:hover { background: #000000; }
 
     .download-btn {
-      background: #1e40af;
+      background: #383838;
       width: 100%;
       padding: 18px;
       font-size: 1.25em;
       margin-top: 35px;
     }
+    .download-btn:hover {
+        background-color: #000000;}
 
     .report-section {
-      border: 2px solid #1e40af;
+      border: 2px solid #000000;
       padding: 45px;
       background: white;
       border-radius: 8px;
@@ -110,12 +112,12 @@
     .filtered-section {
       margin-top: 40px;
       padding: 25px;
-      background: #f8fafc;
+      background: #a39ea7;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
     }
     .filtered-section h3 {
-      color: #1e3a8a;
+      color: #000000;
       margin-bottom: 15px;
     }
     .filtered-list {
@@ -148,7 +150,7 @@
     <label>ONE Movement Reports Date (Previous Date)</label>
     <input type="text" id="oneDate" value="01-May-2026">
 
-    <h3 style="margin-top:30px; color:#1e40af;"> Auto-Filler </h3>
+    <h3 style="margin-top:30px; color:#000000;"> Auto-Filler </h3>
     
     <!-- Inward Upload -->
     <div class="excel-section">
@@ -208,17 +210,17 @@
     Download Report as Image :)
   </button>
 
-  <!-- ==================== FILTERED DATA SECTION ==================== -->
+  <!-- ==================== FILTERING SECTION ==================== -->
   <div class="filtered-section">
-    <h3>Filtered / Removed Containers (ONE)</h3>
+    <h3>Filtered Containers </h3>
     
     <div id="filteredInward" style="margin-bottom:30px;">
-      <strong>INWARD Filtered:</strong> <span id="inwardFilteredCount">0</span> containers
+      <strong>INWARD <span id="inwardFilteredCount">0</span> Containers Filtered:</strong> 
       <div id="inwardFilteredList" class="filtered-list"></div>
     </div>
 
     <div id="filteredOutward">
-      <strong>OUTWARD Filtered:</strong> <span id="outwardFilteredCount">0</span> containers
+      <strong>OUTWARD <span id="outwardFilteredCount">0</span> Containers Filtered:</strong> 
       <div id="outwardFilteredList" class="filtered-list"></div>
     </div>
   </div>
@@ -230,7 +232,7 @@
 let filteredInwardData = [];
 let filteredOutwardData = [];
 
-// ================== EXCEL PARSING - UPDATED WITH REQUESTED COLUMNS ==================
+// ================== EXCEL PARSING ==================
 async function parseExcelFile(file, type) { 
   try {
     const arrayBuffer = await file.arrayBuffer();
@@ -251,7 +253,7 @@ async function parseExcelFile(file, type) {
       let containerInfo = {};
 
       if (type === "inward") {
-        if (i === 1) continue;                    // Skip header
+        if (i === 1) continue;               
         const colL = String(row[11] || '').trim().toUpperCase();   // Column L
         
         if (colL.includes("OCEAN NETWORK EXPRESS")) {
@@ -310,7 +312,7 @@ async function parseExcelFile(file, type) {
   }
 }
 
-// ================== Rest of the code remains the same (Image handling, uploads, etc.) ==================
+
 let uploadedImageURL = null;
 
 const tableUploadArea = document.getElementById('tableUploadArea');
@@ -439,13 +441,13 @@ function generateReport() {
     </div>
     ${tableHTML}
     <hr>
-    <h2 style="text-align:center; margin:45px 0 18px; color:#1e3a8a;">ONE INWARD AT</h2>
+    <h2 style="text-align:center; margin:45px 0 18px; color:#000000;">ONE INWARD AT</h2>
     <p style="text-align:center; font-size:1.25em;">${oneDate}</p>
     <ul>${inwardList || '<li style="color:#64748b;">No items</li>'}</ul>
     <div class="total">TOTAL = ${inTotal}</div>
 
     <hr>
-    <h2 style="text-align:center; margin:45px 0 18px; color:#1e3a8a;">ONE OUTWARD AT</h2>
+    <h2 style="text-align:center; margin:45px 0 18px; color:#000000;">ONE OUTWARD AT</h2>
     <p style="text-align:center; font-size:1.25em;">${oneDate}</p>
     <ul>${outwardList || '<li style="color:#64748b;">No items</li>'}</ul>
     <div class="total">TOTAL = ${outTotal}</div>
@@ -489,7 +491,7 @@ function updateFilteredDisplay() {
 
 function downloadAsImage() {
   if (!uploadedImageURL) {
-    alert("Please paste or upload the Daily Inventory Table screenshot first!");
+    alert("Please paste or upload the Daily Inventory screenshot to continue!");
     return;
   }
   const outputDiv = document.getElementById('output');
