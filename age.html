@@ -2,110 +2,96 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ONE Age Full Converter - Exact Format</title>
+  <title>ONE Age Full Converter</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    body { font-family: Arial; background: #f4f4f4; padding: 20px; }
-    .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
-    h1 { text-align: center; color: #1e3a8a; }
-    button { padding: 12px 20px; background: #1e40af; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 30px; }
+    .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); text-align: center; }
+    h1 { color: #1e3a8a; }
+    input, button { padding: 12px; margin: 15px; font-size: 17px; }
+    button { background: #1e40af; color: white; border: none; border-radius: 6px; cursor: pointer; }
     button:hover { background: #1e3a8a; }
-    #preview { margin-top: 20px; max-height: 70vh; overflow: auto; border: 1px solid #ccc; padding: 10px; background: #fff; }
   </style>
 </head>
 <body>
 <div class="container">
-  <h1>ONE Container Age Report → Exact "one age full.xls" Format</h1>
+  <h1>ONE Container Age Report Converter</h1>
+  <p>Upload <strong>one rptage.xls</strong> → Get exact format like <strong>one age full.xls</strong></p>
+  
   <input type="file" id="fileInput" accept=".xls,.xlsx"><br><br>
-  <button onclick="convertFile()">Convert to Full Format</button>
-  <button id="downloadBtn" onclick="downloadFile()" style="display:none;">Download one_age_full.xlsx</button>
-
-  <div id="preview"></div>
+  <button onclick="convertToFullFormat()">Convert to one_age_full.xlsx</button>
 </div>
 
 <script>
-let finalWorkbook = null;
-
-async function convertFile() {
+async function convertToFullFormat() {
   const file = document.getElementById('fileInput').files[0];
-  if (!file) return alert("Please upload one rptage.xls");
+  if (!file) return alert("Please upload the file");
 
   const reader = new FileReader();
   reader.onload = function(e) {
     const wb = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-    finalWorkbook = XLSX.utils.book_new();
+    const newWB = XLSX.utils.book_new();
 
-    let allData = [];
-    let typeGroups = {};
+    let currentType = "";
+    let allRows = [];
 
-    wb.SheetNames.forEach(name => {
-      const json = XLSX.utils.sheet_to_json(wb.Sheets[name], {header: 1, defval: ""});
+    wb.SheetNames.forEach(sheet => {
+      const json = XLSX.utils.sheet_to_json(wb.Sheets[sheet], {header: 1});
 
-      let currentType = "Unknown";
       json.forEach(row => {
-        const strRow = row.join(" ");
-        if (strRow.includes("Size/Type")) {
-          const match = strRow.match(/(20GP|20RF|20|40GP|40HC|40FR|40HCRF|45HC|40 HCRF)/i);
-          if (match) currentType = match[0].replace(/\s+/g, '').toUpperCase();
+        const rowStr = row.join(" ");
+        
+        if (rowStr.includes("Size/Type")) {
+          const match = rowStr.match(/(20GP|20RF|40FR|40GP|40HC|40HCRF|45HC)/i);
+          if (match) currentType = match[0].toUpperCase();
         }
 
-        if (row.length > 10 && /^[0-9]/.test(row[0])) {
-          const cleanRow = {
-            No: row[0],
-            ContainerNo: row[1],
-            ManfYear: row[5],
-            InwardDate: row[6],
-            Status: row[7],
-            Reserved: row[9],
-            RADate: row[10],
-            ReDate: row[11],
-            Days: row[14],
-            LastCargo: row[16] || "",
-            Remarks: row[17] || ""
-          };
-          allData.push(cleanRow);
-
-          if (!typeGroups[currentType]) typeGroups[currentType] = [];
-          typeGroups[currentType].push(cleanRow);
+        if (currentType && row.length > 8 && row[0] && !isNaN(parseInt(row[0]))) {
+          allRows.push([...row]);
         }
       });
     });
 
-    // Create sheets per type
-    Object.keys(typeGroups).forEach(type => {
-      const data = typeGroups[type];
-      const header = [["No", "Container No", "ManfYear", "Inward Date", "Status", "Reserved", "R/A Date", "Re Date", "Days", "LastCargo", "Remarks"]];
-      const rows = data.map(d => [d.No, d.ContainerNo, d.ManfYear, d.InwardDate, d.Status, d.Reserved, d.RADate, d.ReDate, d.Days, d.LastCargo, d.Remarks]);
-      
-      const ws = XLSX.utils.aoa_to_sheet(header.concat(rows));
-      XLSX.utils.book_append_sheet(finalWorkbook, ws, type);
+    // Main Sheets by Size/Type
+    const typeMap = {};
+    allRows.forEach(row => {
+      const type = currentType || "Data";
+      if (!typeMap[type]) typeMap[type] = [];
+      typeMap[type].push(row);
     });
 
-    // Summary Sheet
-    const summary = [["Size/Type", "Count"]];
-    Object.keys(typeGroups).forEach(t => summary.push([t, typeGroups[t].length]));
-    summary.push(["Total", allData.length]);
-    XLSX.utils.book_append_sheet(finalWorkbook, XLSX.utils.aoa_to_sheet(summary), "Summary");
+    Object.keys(typeMap).forEach(type => {
+      const data = typeMap[type];
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      XLSX.utils.book_append_sheet(newWB, ws, type);
+    });
 
-    // Preview
-    renderPreview();
-    document.getElementById('downloadBtn').style.display = 'inline-block';
+    // Cargo Type Grouping (TEA, GARMENT, FIBER, FROZEN etc.)
+    const cargoGroups = {};
+    allRows.forEach(row => {
+      const lastCargo = String(row[16] || "").toUpperCase().trim();
+      let group = "OTHER";
+
+      if (lastCargo.includes("TEA")) group = "TEA";
+      else if (lastCargo.includes("GARMENT")) group = "GARMENT";
+      else if (lastCargo.includes("FIBER")) group = "FIBER";
+      else if (["FROZEN", "SHRIMPS", "POTATOES", "ONION", "APPLES", "POMEGRANATE", "GRAPE"].some(k => lastCargo.includes(k))) 
+        group = "FROZEN CARGO";
+
+      if (!cargoGroups[group]) cargoGroups[group] = [];
+      cargoGroups[group].push(row);
+    });
+
+    Object.keys(cargoGroups).forEach(group => {
+      const ws = XLSX.utils.aoa_to_sheet(cargoGroups[group]);
+      XLSX.utils.book_append_sheet(newWB, ws, group);
+    });
+
+    // Download
+    XLSX.writeFile(newWB, "one_age_full.xlsx");
+    alert("✅ Conversion completed! File downloaded as one_age_full.xlsx");
   };
   reader.readAsArrayBuffer(file);
-}
-
-function renderPreview() {
-  const preview = document.getElementById('preview');
-  preview.innerHTML = "<h2>Preview - First Sheet</h2>";
-  if (!finalWorkbook.SheetNames.length) return;
-  
-  const firstSheet = finalWorkbook.Sheets[finalWorkbook.SheetNames[0]];
-  preview.innerHTML += XLSX.utils.sheet_to_html(firstSheet);
-}
-
-function downloadFile() {
-  if (!finalWorkbook) return;
-  XLSX.writeFile(finalWorkbook, "one_age_full.xlsx");
 }
 </script>
 </body>
