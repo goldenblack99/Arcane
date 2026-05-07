@@ -2,96 +2,109 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ONE Age Full Converter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONE Container Age Report Converter</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 30px; }
-    .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); text-align: center; }
-    h1 { color: #1e3a8a; }
-    input, button { padding: 12px; margin: 15px; font-size: 17px; }
+    body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+    .container { max-width: 1300px; margin: auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    h1 { text-align: center; color: #1e3a8a; }
+    input, button { padding: 12px; margin: 10px; font-size: 16px; }
     button { background: #1e40af; color: white; border: none; border-radius: 6px; cursor: pointer; }
     button:hover { background: #1e3a8a; }
+    #preview { margin-top: 20px; max-height: 65vh; overflow: auto; border: 1px solid #ddd; padding: 10px; background: #fafafa; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.95em; }
+    th, td { border: 1px solid #aaa; padding: 6px 8px; text-align: left; }
+    th { background: #1e40af; color: white; position: sticky; top: 0; }
   </style>
 </head>
 <body>
 <div class="container">
   <h1>ONE Container Age Report Converter</h1>
-  <p>Upload <strong>one rptage.xls</strong> → Get exact format like <strong>one age full.xls</strong></p>
+  <p>Upload <strong>one rptage.xls</strong> → Separate by Size/Type + Preview + Download</p>
   
   <input type="file" id="fileInput" accept=".xls,.xlsx"><br><br>
-  <button onclick="convertToFullFormat()">Convert to one_age_full.xlsx</button>
+  <button onclick="processFile()">Process & Preview</button>
+  <button id="downloadBtn" onclick="downloadFile()" style="display:none;">Download one_age_full.xlsx</button>
+
+  <div id="preview"></div>
 </div>
 
 <script>
-async function convertToFullFormat() {
+let processedWorkbook = null;
+
+function processFile() {
   const file = document.getElementById('fileInput').files[0];
-  if (!file) return alert("Please upload the file");
+  if (!file) return alert("Please select one rptage.xls file");
 
   const reader = new FileReader();
   reader.onload = function(e) {
-    const wb = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-    const newWB = XLSX.utils.book_new();
+    const data = new Uint8Array(e.target.result);
+    const wb = XLSX.read(data, { type: 'array' });
+    processedWorkbook = XLSX.utils.book_new();
 
     let currentType = "";
-    let allRows = [];
 
-    wb.SheetNames.forEach(sheet => {
-      const json = XLSX.utils.sheet_to_json(wb.Sheets[sheet], {header: 1});
+    wb.SheetNames.forEach(sheetName => {
+      const json = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, defval: "" });
+
+      let dataRows = [];
+      let headerFound = false;
 
       json.forEach(row => {
-        const rowStr = row.join(" ");
-        
+        const rowStr = row.join(" ").trim();
+
+        // Detect Size/Type
         if (rowStr.includes("Size/Type")) {
           const match = rowStr.match(/(20GP|20RF|40FR|40GP|40HC|40HCRF|45HC)/i);
           if (match) currentType = match[0].toUpperCase();
+          return;
         }
 
-        if (currentType && row.length > 8 && row[0] && !isNaN(parseInt(row[0]))) {
-          allRows.push([...row]);
+        // Collect data rows
+        if (currentType && row.length > 5 && row[0] && String(row[0]).trim() !== "" && !isNaN(parseInt(row[0]))) {
+          dataRows.push(row);
         }
       });
+
+      if (dataRows.length > 0) {
+        const ws = XLSX.utils.aoa_to_sheet(dataRows);
+        XLSX.utils.book_append_sheet(processedWorkbook, ws, currentType || "Unknown");
+      }
     });
 
-    // Main Sheets by Size/Type
-    const typeMap = {};
-    allRows.forEach(row => {
-      const type = currentType || "Data";
-      if (!typeMap[type]) typeMap[type] = [];
-      typeMap[type].push(row);
+    // Add Summary
+    const summaryData = [["Size/Type", "Count"]];
+    processedWorkbook.SheetNames.forEach(name => {
+      const count = XLSX.utils.sheet_to_json(processedWorkbook.Sheets[name]).length;
+      summaryData.push([name, count]);
     });
+    const sumWs = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(processedWorkbook, sumWs, "Summary");
 
-    Object.keys(typeMap).forEach(type => {
-      const data = typeMap[type];
-      const ws = XLSX.utils.aoa_to_sheet(data);
-      XLSX.utils.book_append_sheet(newWB, ws, type);
-    });
-
-    // Cargo Type Grouping (TEA, GARMENT, FIBER, FROZEN etc.)
-    const cargoGroups = {};
-    allRows.forEach(row => {
-      const lastCargo = String(row[16] || "").toUpperCase().trim();
-      let group = "OTHER";
-
-      if (lastCargo.includes("TEA")) group = "TEA";
-      else if (lastCargo.includes("GARMENT")) group = "GARMENT";
-      else if (lastCargo.includes("FIBER")) group = "FIBER";
-      else if (["FROZEN", "SHRIMPS", "POTATOES", "ONION", "APPLES", "POMEGRANATE", "GRAPE"].some(k => lastCargo.includes(k))) 
-        group = "FROZEN CARGO";
-
-      if (!cargoGroups[group]) cargoGroups[group] = [];
-      cargoGroups[group].push(row);
-    });
-
-    Object.keys(cargoGroups).forEach(group => {
-      const ws = XLSX.utils.aoa_to_sheet(cargoGroups[group]);
-      XLSX.utils.book_append_sheet(newWB, ws, group);
-    });
-
-    // Download
-    XLSX.writeFile(newWB, "one_age_full.xlsx");
-    alert("✅ Conversion completed! File downloaded as one_age_full.xlsx");
+    renderPreview();
+    document.getElementById('downloadBtn').style.display = 'inline-block';
   };
   reader.readAsArrayBuffer(file);
+}
+
+function renderPreview() {
+  const previewDiv = document.getElementById('preview');
+  previewDiv.innerHTML = "<h2>Preview (First Size/Type Sheet)</h2>";
+
+  if (!processedWorkbook || !processedWorkbook.SheetNames.length) return;
+
+  const firstSheetName = processedWorkbook.SheetNames[0];
+  const ws = processedWorkbook.Sheets[firstSheetName];
+  const htmlTable = XLSX.utils.sheet_to_html(ws);
+  
+  previewDiv.innerHTML += `<h3>\( {firstSheetName} ( \){XLSX.utils.sheet_to_json(ws).length} containers)</h3>`;
+  previewDiv.innerHTML += htmlTable;
+}
+
+function downloadFile() {
+  if (!processedWorkbook) return alert("Please process a file first");
+  XLSX.writeFile(processedWorkbook, "one_age_full.xlsx");
 }
 </script>
 </body>
