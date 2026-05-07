@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONE Container Age Report → Clean Format</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+    .container { max-width: 1300px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    h1 { text-align: center; color: #1e3a8a; }
+    input, button { padding: 12px; margin: 10px 5px; font-size: 16px; }
+    button { background: #1e40af; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #1e3a8a; }
+    .preview { margin-top: 20px; max-height: 70vh; overflow: auto; border: 1px solid #ddd; padding: 10px; background: #fafafa; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.9em; }
+    th, td { border: 1px solid #999; padding: 6px 8px; text-align: left; }
+    th { background: #1e40af; color: white; position: sticky; top: 0; }
+    .section { margin: 20px 0; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>ONE Container Age Report Converter</h1>
+  <p>Upload <strong>one rptage.xls</strong> → Get clean formatted report like <strong>one age full.xls</strong></p>
+  
+  <input type="file" id="fileInput" accept=".xls,.xlsx">
+  <button onclick="processFile()">Convert & Preview</button>
+  <button id="downloadBtn" onclick="downloadFile()" style="display:none;">Download Clean Excel</button>
+
+  <div id="preview"></div>
+</div>
+
+<script>
+let processedWB = null;
+
+async function processFile() {
+  const file = document.getElementById('fileInput').files[0];
+  if (!file) return alert("Please select a file");
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const data = new Uint8Array(e.target.result);
+    const wb = XLSX.read(data, { type: 'array' });
+    processedWB = XLSX.utils.book_new();
+
+    const summary = [["Size/Type", "Count", "Oldest (Days)"]];
+
+    wb.SheetNames.forEach(sheetName => {
+      const ws = wb.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+
+      let currentType = "";
+      let headers = [];
+      let rows = [];
+
+      for (let i = 0; i < json.length; i++) {
+        const row = json[i].map(cell => String(cell).trim());
+
+        // Detect Size/Type
+        if (row.some(cell => cell.includes("Size/Type"))) {
+          const typeMatch = row.join(" ").match(/(20GP|20RF|40FR|40GP|40HC|40HCRF|45HC|20|40|45)/i);
+          if (typeMatch) currentType = typeMatch[0].toUpperCase().replace(/ /g,'');
+          continue;
+        }
+
+        // Detect header row
+        if (row.includes("Container No") || row.includes("No") && row.includes("ManfYear")) {
+          headers = row;
+          continue;
+        }
+
+        // Collect data rows
+        if (currentType && row.length > 5 && row[1] && /^[A-Z0-9]{4}/.test(row[1])) {
+          const newRow = [
+            row[0] || "",           // No
+            row[1] || "",           // Container No
+            row[5] || "",           // ManfYear
+            row[6] || "",           // Inward Date
+            row[7] || "",           // Status
+            row[9] || "",           // Reserved
+            row[10] || "",          // R/A Date
+            row[11] || "",          // Re Date
+            row[14] || "",          // Days
+            row[16] || "",          // LastCargo
+            row[17] || ""           // Remarks
+          ];
+          rows.push(newRow);
+        }
+      }
+
+      if (rows.length > 0) {
+        // Add header
+        const cleanRows = [["No", "Container No", "ManfYear", "Inward Date", "Status", "Reserved", 
+                           "R/A Date", "Re Date", "Days", "LastCargo", "Remarks"], ...rows];
+
+        const newWs = XLSX.utils.aoa_to_sheet(cleanRows);
+        XLSX.utils.book_append_sheet(processedWB, newWs, currentType || "Data");
+
+        // Summary
+        summary.push([currentType || "Unknown", rows.length, rows.reduce((max, r) => Math.max(max, parseInt(r[8]||0)||0), 0)]);
+      }
+    });
+
+    // Add Summary Sheet
+    const sumWs = XLSX.utils.aoa_to_sheet(summary);
+    XLSX.utils.book_append_sheet(processedWB, sumWs, "Summary");
+
+    renderPreview();
+    document.getElementById('downloadBtn').style.display = 'inline-block';
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function renderPreview() {
+  const preview = document.getElementById('preview');
+  preview.innerHTML = "<h2>Preview (First Type Sheet)</h2>";
+
+  if (!processedWB.SheetNames.length) return;
+
+  const sheetName = processedWB.SheetNames[0];
+  const ws = processedWB.Sheets[sheetName];
+  const html = XLSX.utils.sheet_to_html(ws, { editable: false });
+  preview.innerHTML += `<div class="section"><strong>\( {sheetName}</strong> \){html}</div>`;
+}
+
+function downloadFile() {
+  if (!processedWB) return;
+  const date = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(processedWB, `ONE_Age_Full_Clean_${date}.xlsx`);
+}
+</script>
+</body>
+</html>
