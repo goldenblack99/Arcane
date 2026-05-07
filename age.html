@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ONE Container Age Report Converter</title>
+  <title>ONE Container Age Full Converter</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
@@ -13,15 +13,15 @@
     button { background: #1e40af; color: white; border: none; border-radius: 6px; cursor: pointer; }
     button:hover { background: #1e3a8a; }
     #preview { margin-top: 20px; max-height: 65vh; overflow: auto; border: 1px solid #ddd; padding: 10px; background: #fafafa; }
-    table { border-collapse: collapse; width: 100%; font-size: 0.95em; }
-    th, td { border: 1px solid #aaa; padding: 6px 8px; text-align: left; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.9em; }
+    th, td { border: 1px solid #999; padding: 6px 8px; text-align: left; }
     th { background: #1e40af; color: white; position: sticky; top: 0; }
   </style>
 </head>
 <body>
 <div class="container">
   <h1>ONE Container Age Report Converter</h1>
-  <p>Upload <strong>one rptage.xls</strong> → Separate by Size/Type + Preview + Download</p>
+  <p>Upload <strong>one rptage.xls</strong> → Size/Type sheets + Cargo Group sheets + Preview</p>
   
   <input type="file" id="fileInput" accept=".xls,.xlsx"><br><br>
   <button onclick="processFile()">Process & Preview</button>
@@ -35,7 +35,7 @@ let processedWorkbook = null;
 
 function processFile() {
   const file = document.getElementById('fileInput').files[0];
-  if (!file) return alert("Please select one rptage.xls file");
+  if (!file) return alert("Please select one rptage.xls");
 
   const reader = new FileReader();
   reader.onload = function(e) {
@@ -44,43 +44,71 @@ function processFile() {
     processedWorkbook = XLSX.utils.book_new();
 
     let currentType = "";
+    let allRows = [];
 
     wb.SheetNames.forEach(sheetName => {
       const json = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, defval: "" });
 
-      let dataRows = [];
-      let headerFound = false;
-
       json.forEach(row => {
-        const rowStr = row.join(" ").trim();
-
-        // Detect Size/Type
+        const rowStr = row.join(" ");
         if (rowStr.includes("Size/Type")) {
           const match = rowStr.match(/(20GP|20RF|40FR|40GP|40HC|40HCRF|45HC)/i);
           if (match) currentType = match[0].toUpperCase();
-          return;
         }
 
-        // Collect data rows
-        if (currentType && row.length > 5 && row[0] && String(row[0]).trim() !== "" && !isNaN(parseInt(row[0]))) {
-          dataRows.push(row);
+        if (currentType && row[0] && !isNaN(parseInt(row[0])) && row.length > 10) {
+          allRows.push(row);
         }
       });
+    });
 
-      if (dataRows.length > 0) {
-        const ws = XLSX.utils.aoa_to_sheet(dataRows);
-        XLSX.utils.book_append_sheet(processedWorkbook, ws, currentType || "Unknown");
+    // === 1. Sheets by Size/Type ===
+    const typeGroups = {};
+    allRows.forEach(row => {
+      const type = currentType || "Other";
+      if (!typeGroups[type]) typeGroups[type] = [];
+      typeGroups[type].push(row);
+    });
+
+    Object.keys(typeGroups).forEach(type => {
+      const ws = XLSX.utils.aoa_to_sheet(typeGroups[type]);
+      XLSX.utils.book_append_sheet(processedWorkbook, ws, type);
+    });
+
+    // === 2. Sheets by Cargo Type ===
+    const cargoGroups = { TEA: [], GARMENT: [], FIBER: [], "FROZEN CARGO": [], OTHER: [] };
+
+    allRows.forEach(row => {
+      const cargoCell = String(row[16] || row[15] || "").toUpperCase();
+      let group = "OTHER";
+
+      if (cargoCell.includes("TEA")) group = "TEA";
+      else if (cargoCell.includes("GARMENT")) group = "GARMENT";
+      else if (cargoCell.includes("FIBER")) group = "FIBER";
+      else if (cargoCell.includes("FROZEN") || cargoCell.includes("SHRIMP") || 
+               cargoCell.includes("POTATO") || cargoCell.includes("ONION") || 
+               cargoCell.includes("APPLE") || cargoCell.includes("POMEGRANATE")) {
+        group = "FROZEN CARGO";
+      }
+
+      if (!cargoGroups[group]) cargoGroups[group] = [];
+      cargoGroups[group].push(row);
+    });
+
+    Object.keys(cargoGroups).forEach(group => {
+      if (cargoGroups[group].length > 0) {
+        const ws = XLSX.utils.aoa_to_sheet(cargoGroups[group]);
+        XLSX.utils.book_append_sheet(processedWorkbook, ws, group);
       }
     });
 
-    // Add Summary
-    const summaryData = [["Size/Type", "Count"]];
-    processedWorkbook.SheetNames.forEach(name => {
-      const count = XLSX.utils.sheet_to_json(processedWorkbook.Sheets[name]).length;
-      summaryData.push([name, count]);
+    // Summary
+    const summary = [["Category", "Count"]];
+    Object.keys(typeGroups).forEach(t => summary.push([t, typeGroups[t].length]));
+    Object.keys(cargoGroups).forEach(g => {
+      if (cargoGroups[g].length > 0) summary.push([g + " (Cargo)", cargoGroups[g].length]);
     });
-    const sumWs = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(processedWorkbook, sumWs, "Summary");
+    XLSX.utils.book_append_sheet(processedWorkbook, XLSX.utils.aoa_to_sheet(summary), "Summary");
 
     renderPreview();
     document.getElementById('downloadBtn').style.display = 'inline-block';
@@ -89,21 +117,19 @@ function processFile() {
 }
 
 function renderPreview() {
-  const previewDiv = document.getElementById('preview');
-  previewDiv.innerHTML = "<h2>Preview (First Size/Type Sheet)</h2>";
+  const preview = document.getElementById('preview');
+  preview.innerHTML = "<h2>Preview (First Size/Type Sheet)</h2>";
 
-  if (!processedWorkbook || !processedWorkbook.SheetNames.length) return;
+  if (!processedWorkbook?.SheetNames?.length) return;
 
-  const firstSheetName = processedWorkbook.SheetNames[0];
-  const ws = processedWorkbook.Sheets[firstSheetName];
-  const htmlTable = XLSX.utils.sheet_to_html(ws);
-  
-  previewDiv.innerHTML += `<h3>\( {firstSheetName} ( \){XLSX.utils.sheet_to_json(ws).length} containers)</h3>`;
-  previewDiv.innerHTML += htmlTable;
+  const sheetName = processedWorkbook.SheetNames[0];
+  const ws = processedWorkbook.Sheets[sheetName];
+  preview.innerHTML += `<h3>${sheetName}</h3>`;
+  preview.innerHTML += XLSX.utils.sheet_to_html(ws);
 }
 
 function downloadFile() {
-  if (!processedWorkbook) return alert("Please process a file first");
+  if (!processedWorkbook) return;
   XLSX.writeFile(processedWorkbook, "one_age_full.xlsx");
 }
 </script>
